@@ -1,10 +1,7 @@
 package com.example.SimbirsoftPractice.rest.controllers;
 
-import com.example.SimbirsoftPractice.rest.domain.Role;
 import com.example.SimbirsoftPractice.rest.dto.CustomerRequestDto;
 import com.example.SimbirsoftPractice.rest.dto.CustomerResponseDto;
-import com.example.SimbirsoftPractice.rest.dto.UserRequestDto;
-import com.example.SimbirsoftPractice.rest.dto.UserResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
