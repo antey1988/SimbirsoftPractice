@@ -31,7 +31,7 @@ public class UserController {
         list.add(new UserResponseDto(1L, "Name1", new ArrayList<>()));
         list.add(new UserResponseDto(2L, "Name2", new ArrayList<>()));
         list.add(new UserResponseDto(3L, "Name3", new ArrayList<>()));
-        return new ResponseEntity<>(list, HttpStatus.OK);
+        return ResponseEntity.ok().body(list);
     }
 
     @PostMapping

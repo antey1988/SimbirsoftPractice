@@ -33,7 +33,7 @@ public class ProjectController {
         List<ProjectResponseDto> list = new ArrayList<>();
         list.add(new ProjectResponseDto(1L, "Name1", "Desc1", new CustomerResponseDto(1L, "Customer1"), new Date(), new Date(), StatusProject.CLOSED));
         list.add(new ProjectResponseDto(2L, "Name2", "Desc2", new CustomerResponseDto(1L, "Customer1"), new Date(), new Date(), StatusProject.OPEN));
-        return new ResponseEntity<>(list, HttpStatus.OK);
+        return ResponseEntity.ok(list);
     }
 
     @PostMapping

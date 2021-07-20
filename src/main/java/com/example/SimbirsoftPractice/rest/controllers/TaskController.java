@@ -37,7 +37,7 @@ public class TaskController {
         ProjectResponseDto projectResponseDto = new ProjectResponseDto();
         list.add(new TaskResponseDto(1L, "Name1", "Desc1", userResponseDto, projectResponseDto));
         list.add(new TaskResponseDto(1L, "Name1", "Desc1", userResponseDto, projectResponseDto));
-        return new ResponseEntity<>(list, HttpStatus.OK);
+        return ResponseEntity.ok().body(list);
     }
 
     @PostMapping

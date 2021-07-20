@@ -32,7 +32,7 @@ public class ReleaseController {
         list.add(new ReleaseResponseDto(1L, "Release1", new Date(), new Date()));
         list.add(new ReleaseResponseDto(2L, "Release2", new Date(), new Date()));
         list.add(new ReleaseResponseDto(3L, "Release3", new Date(), new Date()));
-        return new ResponseEntity<>(list, HttpStatus.OK);
+        return ResponseEntity.ok(list);
     }
 
     @PostMapping

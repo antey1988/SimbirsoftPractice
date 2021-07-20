@@ -30,7 +30,7 @@ public class CustomerController {
         list.add(new CustomerResponseDto(1L, "Name1"));
         list.add(new CustomerResponseDto(2L, "Name2"));
         list.add(new CustomerResponseDto(3L, "Name3"));
-        return new ResponseEntity<>(list, HttpStatus.OK);
+        return ResponseEntity.ok(list);
     }
 
     @PostMapping
