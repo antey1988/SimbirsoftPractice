@@ -1,7 +1,10 @@
 package com.example.SimbirsoftPractice.rest.domain;
 
 public enum Role {
-    ROLE1,
-    ROLE2,
-    ROLE3
+    OPEN_PROJECT,
+    CLOSED_PROJECT,
+    OPEN_TASK,
+    EDIT_TASK,
+    CLOSED_TASK,
+    ALL
 }
