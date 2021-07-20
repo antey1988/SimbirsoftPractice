@@ -1,5 +1,6 @@
 package com.example.SimbirsoftPractice.rest.controllers;
 
+import com.example.SimbirsoftPractice.rest.controllers.exceptions.TestRuntimeException;
 import com.example.SimbirsoftPractice.rest.dto.ReleaseRequestDto;
 import com.example.SimbirsoftPractice.rest.dto.ReleaseResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -45,6 +46,6 @@ public class ReleaseController {
     @DeleteMapping(value = "/{id}")
     @Operation(summary = "Удаление релиза")
     public ResponseEntity<?> deleteRelease(@PathVariable Long id) {
-        return ResponseEntity.ok().build();
+        throw new TestRuntimeException();
     }
 }

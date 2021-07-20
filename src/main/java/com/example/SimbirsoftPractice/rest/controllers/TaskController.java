@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -49,11 +50,11 @@ public class TaskController {
     @DeleteMapping(value = "/{id}")
     @Operation(summary = "Удаление задачи")
     public ResponseEntity<?> deleteTask(@PathVariable Long id) throws IOException {
-        throw new IOException();
+        throw new FileNotFoundException();
     }
 
-    @ExceptionHandler(value = IOException.class)
-    public ResponseEntity<?> exceptionHandler() {
+    @ExceptionHandler(value = FileNotFoundException.class)
+    public ResponseEntity<?> handlerException() {
         return ResponseEntity.notFound().build();
     }
 }

@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -46,7 +47,7 @@ public class ProjectController {
 
     @DeleteMapping(value = "/{id}")
     @Operation(summary = "Удаление проекта")
-    public ResponseEntity<?> deleteProject(@PathVariable Long id) {
-        return ResponseEntity.ok().build();
+    public ResponseEntity<?> deleteProject(@PathVariable Long id) throws FileNotFoundException {
+        throw new FileNotFoundException();
     }
 }
