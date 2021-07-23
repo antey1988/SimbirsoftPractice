@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - property:
+      dbms:  h2, postgresql
+      name:  author
+      value:  Oleg Petrov
+
+  - include: { relativeToChangelogFile: true, file: migrations/changelog-1.0.yaml }

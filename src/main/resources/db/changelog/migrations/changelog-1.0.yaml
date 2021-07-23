@@ -1,0 +1,29 @@
+databaseChangeLog:
+  - changeSet:
+      id: 000000-create-table-consumers
+      author: ${author}
+      changes:
+        - createTable:
+            tableName: consumers
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: name
+                  type: varchar
+                  constraints:
+                    nullable: false
+
+#
+#  - changeSet:
+#      id: 000000-add-comments-project
+#      author: Dilekeeva Ekaterina
+#      changes:
+#        - sql:
+#            dbms: postgresql
+#            stripComments: true
+#            sql: comment on table project is 'Таблица хранения проектов';
