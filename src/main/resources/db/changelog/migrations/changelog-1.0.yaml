@@ -4,7 +4,7 @@ databaseChangeLog:
       author: ${author}
       changes:
         - createTable:
-            tableName: consumers
+            tableName: customers
             columns:
               - column:
                   name: id

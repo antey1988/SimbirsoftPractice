@@ -14,7 +14,7 @@ public class ProjectResponseDto {
     @Schema(description = "Описание проекта")
     private String description;
     @Schema(description = "Клиент")
-    private CustomerResponseDto customer;
+    private Long customer;
     @Schema(description = "Дата начала проекта")
     private Date startDate;
     @Schema(description = "Дата окончания окончания")
@@ -25,7 +25,7 @@ public class ProjectResponseDto {
     public ProjectResponseDto() {
     }
 
-    public ProjectResponseDto(Long id, String name, String description, CustomerResponseDto customer, Date startDate, Date stopDate, StatusProject status) {
+    public ProjectResponseDto(Long id, String name, String description, Long customer, Date startDate, Date stopDate, StatusProject status) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -39,27 +39,55 @@ public class ProjectResponseDto {
         return id;
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public String getName() {
         return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getDescription() {
         return description;
     }
 
-    public CustomerResponseDto getCustomer() {
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Long getCustomer() {
         return customer;
+    }
+
+    public void setCustomer(Long customer) {
+        this.customer = customer;
     }
 
     public Date getStartDate() {
         return startDate;
     }
 
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
+
     public Date getStopDate() {
         return stopDate;
     }
 
+    public void setStopDate(Date stopDate) {
+        this.stopDate = stopDate;
+    }
+
     public StatusProject getStatus() {
         return status;
+    }
+
+    public void setStatus(StatusProject status) {
+        this.status = status;
     }
 }

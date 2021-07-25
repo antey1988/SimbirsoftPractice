@@ -1,12 +1,10 @@
 package com.example.SimbirsoftPractice.rest.controllers;
 
 import com.example.SimbirsoftPractice.rest.domain.StatusProject;
-import com.example.SimbirsoftPractice.rest.dto.CustomerResponseDto;
 import com.example.SimbirsoftPractice.rest.dto.ProjectRequestDto;
 import com.example.SimbirsoftPractice.rest.dto.ProjectResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,8 +29,8 @@ public class ProjectController {
     @Operation(summary = "Список проектов")
     public ResponseEntity<List<ProjectResponseDto>> getProjects() {
         List<ProjectResponseDto> list = new ArrayList<>();
-        list.add(new ProjectResponseDto(1L, "Name1", "Desc1", new CustomerResponseDto(1L, "Customer1"), new Date(), new Date(), StatusProject.CLOSED));
-        list.add(new ProjectResponseDto(2L, "Name2", "Desc2", new CustomerResponseDto(1L, "Customer1"), new Date(), new Date(), StatusProject.OPEN));
+        list.add(new ProjectResponseDto(1L, "Name1", "Desc1", 1L, new Date(), new Date(), StatusProject.CLOSED));
+        list.add(new ProjectResponseDto(2L, "Name2", "Desc2", 2L, new Date(), new Date(), StatusProject.OPEN));
         return ResponseEntity.ok(list);
     }
 
@@ -40,7 +38,7 @@ public class ProjectController {
     @Operation(summary = "Создание проекта")
     public ResponseEntity<ProjectResponseDto> createProject(@RequestBody ProjectRequestDto requestDto) {
         return ResponseEntity.ok()
-                .body(new ProjectResponseDto(3L, requestDto.getName(), requestDto.getDescription(), new CustomerResponseDto(1L, "Name1"),
+                .body(new ProjectResponseDto(3L, requestDto.getName(), requestDto.getDescription(),3L,
                         requestDto.getStartDate(), requestDto.getStopDate(), requestDto.getStatus()));
     }
 
@@ -49,7 +47,7 @@ public class ProjectController {
     public ResponseEntity<ProjectResponseDto> updateProject(@RequestBody ProjectRequestDto requestDto,
                                                       @PathVariable Long id) {
         return ResponseEntity.ok()
-                .body(new ProjectResponseDto(id, requestDto.getName(), requestDto.getDescription(),  new CustomerResponseDto(1L, "Name1"),
+                .body(new ProjectResponseDto(id, requestDto.getName(), requestDto.getDescription(),  4L,
                         requestDto.getStartDate(), requestDto.getStopDate(), requestDto.getStatus()));
     }
 

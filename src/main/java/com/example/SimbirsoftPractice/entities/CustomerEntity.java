@@ -1,6 +1,10 @@
 package com.example.SimbirsoftPractice.entities;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.persistence.Id;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 
 @Entity
 @Table(name = "customers")
@@ -12,10 +16,6 @@ public class CustomerEntity {
     private String name;
 
     public CustomerEntity() {
-    }
-
-    public CustomerEntity(String name) {
-        this.name = name;
     }
 
     public Long getId() {
