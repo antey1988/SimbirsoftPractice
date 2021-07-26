@@ -25,12 +25,13 @@ public class ProjectEntity {
 
     private String description;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     private CustomerEntity customer;
 
-    @Column(nullable = false)
+    @Column(name = "startDate")
     private Date startDate;
 
+    @Column(name = "stopDate")
     private Date stopDate;
 
     @Column(name = "status", nullable = false)

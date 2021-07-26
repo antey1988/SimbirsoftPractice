@@ -1,3 +1,4 @@
+#Создание таблицы клиенты и описания к ней
 databaseChangeLog:
   - changeSet:
       id: 000000-create-table-consumers
@@ -6,24 +7,14 @@ databaseChangeLog:
         - createTable:
             tableName: customers
             columns:
-              - column:
-                  name: id
-                  type: bigint
-                  autoIncrement: true
-                  constraints:
-                    primaryKey: true
-              - column:
-                  name: name
-                  type: varchar
-                  constraints:
-                    nullable: false
+              - column: {name: id, type: bigint, autoIncrement: true, constraints: {primaryKey: true}}
+              - column: {name: name, type: varchar(50), constraints: {nullable: false}}
 
-#
-#  - changeSet:
-#      id: 000000-add-comments-project
-#      author: Dilekeeva Ekaterina
-#      changes:
-#        - sql:
-#            dbms: postgresql
-#            stripComments: true
-#            sql: comment on table project is 'Таблица хранения проектов';
+  - changeSet:
+      id: 000001-add-comments-customers
+      author: ${author}
+      changes:
+        - sql:
+            dbms: h2, postgresql
+            stripComments: true
+            sql: comment on table customers is 'Таблица хранения клиентов';

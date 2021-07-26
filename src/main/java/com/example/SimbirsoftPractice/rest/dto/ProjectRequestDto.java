@@ -7,8 +7,6 @@ import java.util.Date;
 
 @Schema(description = "Данные о проекте (from front to back)")
 public class ProjectRequestDto {
-    @Schema(description = "ID проекта")
-    private Long id;
     @Schema(description = "Наименование проекта")
     private String name;
     @Schema(description = "Описание проекта")
@@ -21,14 +19,6 @@ public class ProjectRequestDto {
     private Date stopDate;
     @Schema(description = "Статус проекта")
     private StatusProject status;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public String getName() {
         return name;

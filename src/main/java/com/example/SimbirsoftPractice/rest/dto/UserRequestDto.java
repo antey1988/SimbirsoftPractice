@@ -6,20 +6,10 @@ import java.util.List;
 
 @Schema(description = "Данные о пользователе (from front to back)")
 public class UserRequestDto {
-    @Schema(description = "ID пользователя")
-    private Long id;
     @Schema(description = "Имя пользователя")
     private String name;
     @Schema(description = "Роли пользователя")
     private List<Role> roles;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public String getName() {
         return name;

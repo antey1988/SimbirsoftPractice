@@ -17,23 +17,10 @@ public class ProjectResponseDto {
     private Long customer;
     @Schema(description = "Дата начала проекта")
     private Date startDate;
-    @Schema(description = "Дата окончания окончания")
+    @Schema(description = "Дата окончания проекта")
     private Date stopDate;
     @Schema(description = "Статус проекта")
     private StatusProject status;
-
-    public ProjectResponseDto() {
-    }
-
-    public ProjectResponseDto(Long id, String name, String description, Long customer, Date startDate, Date stopDate, StatusProject status) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.customer = customer;
-        this.startDate = startDate;
-        this.stopDate = stopDate;
-        this.status = status;
-    }
 
     public Long getId() {
         return id;
