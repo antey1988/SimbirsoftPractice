@@ -57,7 +57,7 @@ databaseChangeLog:
 #            baseTableCatalogName:
             baseTableName: roles
 #            baseTableSchemaName: public
-            constraintName: FK_roles_users
+            constraintName: fk_roles_users
 #            deferrable: true
 #            initiallyDeferred: true
 #            onDelete: CASCADE

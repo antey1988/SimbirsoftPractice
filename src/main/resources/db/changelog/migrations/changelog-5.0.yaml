@@ -1,0 +1,63 @@
+#Создание таблицы задач и описания к ней
+databaseChangeLog:
+  - changeSet:
+      id: 000000-create-table-tasks
+      author: ${author}
+      changes:
+        - createTable:
+            tableName: tasks
+            columns:
+              - column: {name: id, type: bigint, autoIncrement: true, constraints: {primaryKey: true}}
+              - column: {name: name, type: varchar(50), constraints: {nullable: true}}
+              - column: {name: description, type: varchar}
+              - column: {name: creator_id, type: bigint, constraints: {nullable: true}}
+              - column: {name: executor_id, type: bigint}
+              - column: {name: release_id, type: bigint, constraints: {nullable: true}}
+              - column: {name: status, type: varchar(30), constraints: {nullable: true}}
+              - column: {name: border, type: int, defaultValue: 0}
+
+  - changeSet:
+      id: 000001-add-comments-tasks
+      author: ${author}
+      changes:
+        - sql:
+            dbms: h2, postgresql
+            stripComments: true
+            sql: comment on table tasks is 'Таблица хранения задач';
+
+  - changeSet:
+      id: 000002-add-foreign-key-tasks_users_creator
+      author: ${author}
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: creator_id
+            baseTableName: tasks
+            constraintName: fk_tasks_users_creator
+            referencedColumnNames: id
+            referencedTableName: users
+            validate: true
+
+  - changeSet:
+      id: 000003-add-foreign-key-tasks_users_executor
+      author: ${author}
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: executor_id
+            baseTableName: tasks
+            constraintName: fk_tasks_users_executor
+            referencedColumnNames: id
+            referencedTableName: users
+            validate: true
+
+  - changeSet:
+      id: 000004-add-foreign-key-task_releases
+      author: ${author}
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: release_id
+            baseTableName: tasks
+            constraintName: fk_tasks_tasks_releases
+            referencedColumnNames: id
+            referencedTableName: releases
+            validate: true
+

@@ -7,6 +7,7 @@ import com.example.SimbirsoftPractice.rest.controllers.exceptions.NotFoundExcept
 import com.example.SimbirsoftPractice.rest.dto.ProjectRequestDto;
 import com.example.SimbirsoftPractice.rest.dto.ProjectResponseDto;
 import com.example.SimbirsoftPractice.services.ProjectService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -16,6 +17,7 @@ public class ProjectServiceImpl implements ProjectService {
     private final ProjectMapper mapper;
     private final ProjectRepository repository;
 
+    @Autowired
     public ProjectServiceImpl(ProjectMapper mapper, ProjectRepository repository) {
         this.mapper = mapper;
         this.repository = repository;
@@ -29,7 +31,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public ProjectResponseDto getProject(Long id) {
+    public ProjectResponseDto readProject(Long id) {
         ProjectEntity projectEntity = getOrElseThrow(id);
         return mapper.entityToResponseDto(projectEntity);
     }

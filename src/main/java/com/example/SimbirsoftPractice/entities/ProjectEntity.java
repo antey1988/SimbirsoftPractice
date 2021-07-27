@@ -7,10 +7,11 @@ import javax.persistence.Table;
 import javax.persistence.Id;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
+import javax.persistence.ManyToOne;
+import javax.persistence.FetchType;
 import javax.persistence.Column;
 import javax.persistence.Enumerated;
 import javax.persistence.EnumType;
-import javax.persistence.ManyToOne;
 import java.util.Date;
 
 @Entity
@@ -25,7 +26,7 @@ public class ProjectEntity {
 
     private String description;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private CustomerEntity customer;
 
     @Column(name = "startDate")

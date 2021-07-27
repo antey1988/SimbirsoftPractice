@@ -32,28 +32,20 @@ public class TaskController {
     @Operation(summary = "Список задач")
     public ResponseEntity<List<TaskResponseDto>> getTasks() {
         List<TaskResponseDto> list = new ArrayList<>();
-        UserResponseDto userResponseDto = new UserResponseDto(1L, "User1");
-        ProjectResponseDto projectResponseDto = new ProjectResponseDto();
-        list.add(new TaskResponseDto(1L, "Name1", "Desc1", userResponseDto, projectResponseDto));
-        list.add(new TaskResponseDto(1L, "Name1", "Desc1", userResponseDto, projectResponseDto));
         return ResponseEntity.ok().body(list);
     }
 
     @PostMapping
     @Operation(summary = "Создание задачи")
     public ResponseEntity<TaskResponseDto> createTask(@RequestBody TaskRequestDto requestDto) {
-        return ResponseEntity.ok()
-                .body(new TaskResponseDto(3L, requestDto.getName(), requestDto.getDescription(),
-                        new UserResponseDto(1L, "User1"), new ProjectResponseDto()));
+        return ResponseEntity.ok().build();
     }
 
     @PutMapping(value = "/{id}")
     @Operation(summary = "Изменение задачи")
     public ResponseEntity<TaskResponseDto> updateTask(@RequestBody TaskRequestDto requestDto,
                                                          @PathVariable Long id) {
-        return ResponseEntity.ok()
-                .body(new TaskResponseDto(id, requestDto.getName(), requestDto.getDescription(),
-                        new UserResponseDto(1L, "User1"), new ProjectResponseDto()));
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping(value = "/{id}")

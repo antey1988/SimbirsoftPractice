@@ -17,6 +17,7 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
     private final UserRepository repository;
     private final UserMapper mapper;
+
     @Autowired
     public UserServiceImpl(UserRepository userRepository, UserMapper userMapper) {
         this.repository = userRepository;
@@ -24,7 +25,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponseDto getUser(Long id) {
+    public UserResponseDto readUser(Long id) {
         UserEntity userEntity = getOrElseThrow(id);
         return mapper.entityToResponseDto(userEntity);
     }

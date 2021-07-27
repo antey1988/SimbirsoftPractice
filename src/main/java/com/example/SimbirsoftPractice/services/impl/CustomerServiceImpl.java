@@ -24,7 +24,7 @@ public class CustomerServiceImpl implements CustomerService {
         this.mapper = customerMapper;
     }
 
-    public CustomerResponseDto getCustomer(Long id) {
+    public CustomerResponseDto readCustomer(Long id) {
         CustomerEntity customerEntity = getOrElseThrow(id);
         return mapper.entityToResponseDto(customerEntity);
     }

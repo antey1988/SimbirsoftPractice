@@ -9,20 +9,22 @@ import java.util.Date;
 public class TaskRequestDto {
     @Schema(description = "Наименование задачи")
     private String name;
+
     @Schema(description = "Описание задачи")
     private String description;
+
     @Schema(description = "Создатель задачи")
-    private UserRequestDto creator;
+    private Long creator;
+
     @Schema(description = "Исполнитель задачи")
-    private UserRequestDto executor;
-    @Schema(description = "Дата создания задачи")
-    private Date startDate;
-    @Schema(description = "Дата решения задачи")
-    private Date stopDate;
+    private Long executor;
+
+    @Schema(description = "Релиз проекта")
+    private Long release;
+
     @Schema(description = "Статус задачи")
     private StatusTask status;
-    @Schema(description = "Проект")
-    private ProjectRequestDto project;
+
     @Schema(description = "Номер доски проекта")
     private int border;
 
@@ -42,36 +44,28 @@ public class TaskRequestDto {
         this.description = description;
     }
 
-    public UserRequestDto getCreator() {
+    public Long getCreator() {
         return creator;
     }
 
-    public void setCreator(UserRequestDto creator) {
+    public void setCreator(Long creator) {
         this.creator = creator;
     }
 
-    public UserRequestDto getExecutor() {
+    public Long getExecutor() {
         return executor;
     }
 
-    public void setExecutor(UserRequestDto executor) {
+    public void setExecutor(Long executor) {
         this.executor = executor;
     }
 
-    public Date getStartDate() {
-        return startDate;
+    public Long getRelease() {
+        return release;
     }
 
-    public void setStartDate(Date startDate) {
-        this.startDate = startDate;
-    }
-
-    public Date getStopDate() {
-        return stopDate;
-    }
-
-    public void setStopDate(Date stopDate) {
-        this.stopDate = stopDate;
+    public void setRelease(Long release) {
+        this.release = release;
     }
 
     public StatusTask getStatus() {
@@ -80,14 +74,6 @@ public class TaskRequestDto {
 
     public void setStatus(StatusTask status) {
         this.status = status;
-    }
-
-    public ProjectRequestDto getProject() {
-        return project;
-    }
-
-    public void setProject(ProjectRequestDto project) {
-        this.project = project;
     }
 
     public int getBorder() {

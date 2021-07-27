@@ -31,7 +31,7 @@ databaseChangeLog:
         - addForeignKeyConstraint:
             baseColumnNames: customer_id
             baseTableName: projects
-            constraintName: FK_projects_customers
+            constraintName: fk_projects_customers
             referencedColumnNames: id
             referencedTableName: customers
             validate: true

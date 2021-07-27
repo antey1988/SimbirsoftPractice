@@ -39,7 +39,7 @@ public class CustomerController {
     @GetMapping(value = "/{id}")
     @Operation(summary = "Информация о клиенте")
     public ResponseEntity<CustomerResponseDto> getCustomer(@PathVariable Long id) {
-        CustomerResponseDto customerResponseDto = service.getCustomer(id);
+        CustomerResponseDto customerResponseDto = service.readCustomer(id);
         return ResponseEntity.ok(customerResponseDto);
     }
 

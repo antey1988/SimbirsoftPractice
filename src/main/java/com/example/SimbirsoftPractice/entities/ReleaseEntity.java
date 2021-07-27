@@ -1,21 +1,33 @@
-package com.example.SimbirsoftPractice.rest.dto;
+package com.example.SimbirsoftPractice.entities;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.persistence.Id;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Column;
+import javax.persistence.ManyToOne;
+import javax.persistence.FetchType;
 import java.util.Date;
 
-@Schema(description = "Данные о релизе проекта (from back to front)")
-public class ReleaseResponseDto {
-    @Schema(description = "ID релиза")
+@Entity
+@Table(name = "releases")
+public class ReleaseEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Schema(description = "Наименование релиза")
+
+    @Column(nullable = false)
     private String name;
-    @Schema(description = "Дата начала релиза")
+
+    @Column(name = "startDate")
     private Date startDate;
-    @Schema(description = "Дата окончания релиза")
+
+    @Column(name = "stopDate")
     private Date stopDate;
-    @Schema(description = "Проект")
-    private Long project;
+
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    private ProjectEntity project;
 
     public Long getId() {
         return id;
@@ -49,11 +61,11 @@ public class ReleaseResponseDto {
         this.stopDate = stopDate;
     }
 
-    public Long getProject() {
+    public ProjectEntity getProject() {
         return project;
     }
 
-    public void setProject(Long project) {
+    public void setProject(ProjectEntity project) {
         this.project = project;
     }
 }

@@ -12,6 +12,8 @@ public class ReleaseRequestDto {
     private Date startDate;
     @Schema(description = "Дата окончания релиза")
     private Date stopDate;
+    @Schema(description = "Проект")
+    private Long project;
 
     public String getName() {
         return name;
@@ -35,5 +37,13 @@ public class ReleaseRequestDto {
 
     public void setStopDate(Date stopDate) {
         this.stopDate = stopDate;
+    }
+
+    public Long getProject() {
+        return project;
+    }
+
+    public void setProject(Long project) {
+        this.project = project;
     }
 }
