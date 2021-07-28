@@ -26,7 +26,7 @@ public class UserEntity {
     private String name;
 
     @ElementCollection()
-    @CollectionTable(name = "roles_user", joinColumns = @JoinColumn(name = "user_id"))
+    @CollectionTable(name = "roles", joinColumns = @JoinColumn(name = "user_id"))
     @Column(name = "role")
     @Enumerated(EnumType.STRING)
     private List<Role> roles;

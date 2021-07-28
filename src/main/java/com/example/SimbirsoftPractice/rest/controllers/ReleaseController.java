@@ -1,6 +1,5 @@
 package com.example.SimbirsoftPractice.rest.controllers;
 
-import com.example.SimbirsoftPractice.rest.controllers.exceptions.TestRuntimeException;
 import com.example.SimbirsoftPractice.rest.dto.ReleaseRequestDto;
 import com.example.SimbirsoftPractice.rest.dto.ReleaseResponseDto;
 import com.example.SimbirsoftPractice.services.ReleaseService;

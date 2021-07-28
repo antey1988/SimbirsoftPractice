@@ -3,8 +3,6 @@ package com.example.SimbirsoftPractice.rest.dto;
 import com.example.SimbirsoftPractice.rest.domain.StatusTask;
 import io.swagger.v3.oas.annotations.media.Schema;
 
-import java.util.Date;
-
 @Schema(description = "Данные о задаче (from front to back)")
 public class TaskRequestDto {
     @Schema(description = "Наименование задачи")

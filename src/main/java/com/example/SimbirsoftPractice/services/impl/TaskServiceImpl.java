@@ -6,20 +6,20 @@ import com.example.SimbirsoftPractice.repos.TaskRepository;
 import com.example.SimbirsoftPractice.rest.controllers.exceptions.NotFoundException;
 import com.example.SimbirsoftPractice.rest.dto.TaskRequestDto;
 import com.example.SimbirsoftPractice.rest.dto.TaskResponseDto;
-import com.example.SimbirsoftPractice.rest.dto.TaskRequestDto;
-import com.example.SimbirsoftPractice.rest.dto.TaskResponseDto;
-import com.example.SimbirsoftPractice.services.TasksService;
+import com.example.SimbirsoftPractice.services.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
-public class TasksServiceImpl implements TasksService {
+@Service
+public class TaskServiceImpl implements TaskService {
     
     private final TaskMapper mapper;
     private final TaskRepository repository;
     @Autowired
-    public TasksServiceImpl(TaskMapper mapper, TaskRepository repository) {
+    public TaskServiceImpl(TaskMapper mapper, TaskRepository repository) {
         this.mapper = mapper;
         this.repository = repository;
     }
@@ -53,7 +53,7 @@ public class TasksServiceImpl implements TasksService {
 
     private TaskEntity getOrElseThrow(Long id) {
         Optional<TaskEntity> TaskEntity = repository.findById(id);
-        return TaskEntity.orElseThrow(()->new NotFoundException(String.format("Проект с id = %d не существует", id)));
+        return TaskEntity.orElseThrow(()->new NotFoundException(String.format("Задача с id = %d не существует", id)));
     }
 
     @Override
@@ -71,6 +71,12 @@ public class TasksServiceImpl implements TasksService {
     @Override
     public List<TaskResponseDto> readListTasksByExecutorId(Long id) {
         List<TaskEntity> list = repository.findAllByExecutorId(id);
+        return mapper.listEntityToListResponseDto(list);
+    }
+
+    @Override
+    public List<TaskResponseDto> readListAllTasks() {
+        List<TaskEntity> list = repository.findAll();
         return mapper.listEntityToListResponseDto(list);
     }
 }

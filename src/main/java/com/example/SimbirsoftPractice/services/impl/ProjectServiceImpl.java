@@ -10,6 +10,7 @@ import com.example.SimbirsoftPractice.services.ProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -48,6 +49,18 @@ public class ProjectServiceImpl implements ProjectService {
     public void deleteProject(Long id) {
         getOrElseThrow(id);
         repository.deleteById(id);
+    }
+
+    @Override
+    public List<ProjectResponseDto> readListProjects() {
+        List<ProjectEntity> list = repository.findAll();
+        return mapper.listEntityToListResponseDto(list);
+    }
+
+    @Override
+    public List<ProjectResponseDto> readListProjectsOfCustomer(Long id) {
+        List<ProjectEntity> list = repository.findByCustomerId(id);
+        return mapper.listEntityToListResponseDto(list);
     }
 
     private ProjectEntity getOrElseThrow(Long id) {

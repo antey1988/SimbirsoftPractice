@@ -59,6 +59,6 @@ public class ReleaseServiceImpl implements ReleaseService {
 
     private ReleaseEntity getOrElseThrow(Long id) {
         Optional<ReleaseEntity> ReleaseEntity = repository.findById(id);
-        return ReleaseEntity.orElseThrow(()->new NotFoundException(String.format("Проект с id = %d не существует", id)));
+        return ReleaseEntity.orElseThrow(()->new NotFoundException(String.format("Релиз с id = %d не существует", id)));
     }
 }

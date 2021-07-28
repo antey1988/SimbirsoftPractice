@@ -1,11 +1,11 @@
 package com.example.SimbirsoftPractice.rest.controllers;
 
-import com.example.SimbirsoftPractice.rest.dto.ProjectResponseDto;
 import com.example.SimbirsoftPractice.rest.dto.TaskRequestDto;
 import com.example.SimbirsoftPractice.rest.dto.TaskResponseDto;
-import com.example.SimbirsoftPractice.rest.dto.UserResponseDto;
+import com.example.SimbirsoftPractice.services.TaskService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,34 +24,71 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/tasks")
+@RequestMapping("/api")
 @Tag(name = "Задачи", description = "Создание, изменение, удаление, просмотр списка задач")
 public class TaskController {
+    private final TaskService service;
+    @Autowired
+    public TaskController(TaskService service) {
+        this.service = service;
+    }
 
-    @GetMapping
-    @Operation(summary = "Список задач")
-    public ResponseEntity<List<TaskResponseDto>> getTasks() {
-        List<TaskResponseDto> list = new ArrayList<>();
+    @PostMapping(value = "/tasks")
+    @Operation(summary = "Создание новой задачи")
+    public ResponseEntity<TaskResponseDto> createTask(@RequestBody TaskRequestDto requestDto) {
+        TaskResponseDto responseDto = service.createTask(requestDto);
+        return ResponseEntity.ok().body(responseDto);
+    }
+
+    @GetMapping(value = "/tasks/{id}")
+    @Operation(summary = "Просмотр сосотояния задачи")
+    public ResponseEntity<TaskResponseDto> readTask(@PathVariable Long id) {
+        TaskResponseDto responseDto = service.readTask(id);
+        return ResponseEntity.ok().body(responseDto);
+    }
+
+    @PutMapping(value = "/tasks/{id}")
+    @Operation(summary = "Изменение состояния задачи")
+    public ResponseEntity<TaskResponseDto> updateTask(@RequestBody TaskRequestDto requestDto,
+                                                         @PathVariable Long id) {
+        TaskResponseDto responseDto = service.updateTask(requestDto, id);
+        return ResponseEntity.ok().body(responseDto);
+    }
+
+    @DeleteMapping(value = "/tasks/{id}")
+    @Operation(summary = "Удаление задачи")
+    public ResponseEntity<?> deleteTask(@PathVariable Long id) {
+        service.deleteTask(id);
+        return ResponseEntity.accepted().build();
+    }
+
+
+    @GetMapping(value = "/tasks")
+    @Operation(summary = "Список всех задач")
+    public ResponseEntity<List<TaskResponseDto>> readListTasks() {
+        List<TaskResponseDto> list = service.readListAllTasks();
         return ResponseEntity.ok().body(list);
     }
 
-    @PostMapping
-    @Operation(summary = "Создание задачи")
-    public ResponseEntity<TaskResponseDto> createTask(@RequestBody TaskRequestDto requestDto) {
-        return ResponseEntity.ok().build();
+    @GetMapping(value = "releases/{id}/tasks")
+    @Operation(summary = "Список всех задач, созданных в рамках одного релиза")
+    public ResponseEntity<List<TaskResponseDto>> readListTasksOfRelease(Long id) {
+        List<TaskResponseDto> list = service.readListTasksByReleaseId(id);
+        return ResponseEntity.ok().body(list);
     }
 
-    @PutMapping(value = "/{id}")
-    @Operation(summary = "Изменение задачи")
-    public ResponseEntity<TaskResponseDto> updateTask(@RequestBody TaskRequestDto requestDto,
-                                                         @PathVariable Long id) {
-        return ResponseEntity.ok().build();
+    @GetMapping(value = "user/{id}/tasks/creation")
+    @Operation(summary = "Список всех задач, созданных одним пользователем")
+    public ResponseEntity<List<TaskResponseDto>> readListTasksOfCreatorUser(Long id) {
+        List<TaskResponseDto> list = service.readListTasksByCreatorId(id);
+        return ResponseEntity.ok().body(list);
     }
 
-    @DeleteMapping(value = "/{id}")
-    @Operation(summary = "Удаление задачи")
-    public ResponseEntity<?> deleteTask(@PathVariable Long id) throws IOException {
-        throw new FileNotFoundException();
+    @GetMapping(value = "user/{id}/tasks/execution")
+    @Operation(summary = "Список всех задач, испольнителем которых является указанный пользователь")
+    public ResponseEntity<List<TaskResponseDto>> readListTasksOfExecutorUser(Long id) {
+        List<TaskResponseDto> list = service.readListTasksByExecutorId(id);
+        return ResponseEntity.ok().body(list);
     }
 
     @ExceptionHandler(value = FileNotFoundException.class)
