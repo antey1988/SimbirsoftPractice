@@ -1,24 +1,54 @@
-package com.example.SimbirsoftPractice.rest.dto;
+package com.example.SimbirsoftPractice.entities;
 
 import com.example.SimbirsoftPractice.rest.domain.StatusProject;
-import io.swagger.v3.oas.annotations.media.Schema;
 
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.persistence.Id;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.ManyToOne;
+import javax.persistence.FetchType;
+import javax.persistence.Column;
+import javax.persistence.Enumerated;
+import javax.persistence.EnumType;
 import java.util.Date;
 
-@Schema(description = "Данные о проекте (from front to back)")
-public class ProjectRequestDto {
-    @Schema(description = "Наименование проекта")
+@Entity
+@Table(name = "projects")
+public class ProjectEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false)
     private String name;
-    @Schema(description = "Описание проекта")
+
     private String description;
-    @Schema(description = "Клиент")
-    private Long customer;
-    @Schema(description = "Дата начала проекта")
+
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    private CustomerEntity customer;
+
+    @Column(name = "startDate")
     private Date startDate;
-    @Schema(description = "Дата окончания проекта")
+
+    @Column(name = "stopDate")
     private Date stopDate;
-    @Schema(description = "Статус проекта")
+
+    @Column(name = "status", nullable = false)
+    @Enumerated(EnumType.STRING)
     private StatusProject status;
+
+    public ProjectEntity() {
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;
@@ -52,11 +82,11 @@ public class ProjectRequestDto {
         this.description = description;
     }
 
-    public Long getCustomer() {
+    public CustomerEntity getCustomer() {
         return customer;
     }
 
-    public void setCustomer(Long customer) {
+    public void setCustomer(CustomerEntity customer) {
         this.customer = customer;
     }
 

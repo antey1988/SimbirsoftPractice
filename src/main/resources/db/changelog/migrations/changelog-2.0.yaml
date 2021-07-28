@@ -1,0 +1,69 @@
+#Создание таблиц пользователи и роли пользователей, и описаний к нем
+databaseChangeLog:
+  - changeSet:
+      id: 000000-create-table-users
+      author: ${author}
+      changes:
+        - createTable:
+            tableName: users
+            columns:
+              - column: {name: id, type: bigint, autoIncrement: true, constraints: {primaryKey: true}}
+              - column: {name: name, type: varchar(50), constraints: {nullable: false}}
+
+  - changeSet:
+      id: 000001-add-comments-users
+      author: ${author}
+      changes:
+        - sql:
+            dbms: h2, postgresql
+            stripComments: true
+            sql: comment on table users is 'Таблица хранения пользователей'
+
+  - changeSet:
+      id: 000002-create-table-roles
+      author: ${author}
+      changes:
+        - createTable:
+            tableName: roles
+            columns:
+              - column: {name: user_id, type: bigint, constraints: {nullable: false}}
+              - column: {name: role, type: varchar(30), constraints: {nullable: false}}
+
+  - changeSet:
+      id: 000003-add-comments-roles
+      author: ${author}
+      changes:
+        - sql:
+            dbms: h2, postgresql
+            stripComments: true
+            sql: comment on table roles is 'Таблица хранения ролей пользователей'
+
+  - changeSet:
+      id: 000004-add-unique-key-roles
+      author: ${author}
+      changes:
+        - addUniqueConstraint:
+            columnNames: user_id, role
+            constraintName: UnKey_role_user
+            tableName: roles
+
+
+  - changeSet:
+      id: 000005-add-foreign-key-roles_users
+      author: ${author}
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: user_id
+#            baseTableCatalogName:
+            baseTableName: roles
+#            baseTableSchemaName: public
+            constraintName: fk_roles_users
+#            deferrable: true
+#            initiallyDeferred: true
+#            onDelete: CASCADE
+#            onUpdate: RESTRICT
+            referencedColumnNames: id
+#            referencedTableCatalogName:
+            referencedTableName: users
+#            referencedTableSchemaName: public
+            validate: true

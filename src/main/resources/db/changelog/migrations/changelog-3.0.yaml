@@ -1,0 +1,37 @@
+#Создание таблицы проекты и описания к ней
+databaseChangeLog:
+  - changeSet:
+      id: 000000-create-table-projects
+      author: ${author}
+      changes:
+        - createTable:
+            tableName: projects
+            columns:
+              - column: {name: id, type: bigint, autoIncrement: true, constraints: {primaryKey: true}}
+              - column: {name: name, type: varchar(50), constraints: {nullable: true}}
+              - column: {name: description, type: varchar}
+              - column: {name: customer_id, type: bigint, constraints: {nullable: true}}
+              - column: {name: start_date, type: datetime}
+              - column: {name: stop_date, type: datetime}
+              - column: {name: status, type: varchar(30), constraints: {nullable: true}}
+
+  - changeSet:
+      id: 000001-add-comments-projects
+      author: ${author}
+      changes:
+        - sql:
+            dbms: h2, postgresql
+            stripComments: true
+            sql: comment on table projects is 'Таблица хранения проектов';
+
+  - changeSet:
+      id: 000002-add-foreign-key-projects_customers
+      author: ${author}
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: customer_id
+            baseTableName: projects
+            constraintName: fk_projects_customers
+            referencedColumnNames: id
+            referencedTableName: customers
+            validate: true

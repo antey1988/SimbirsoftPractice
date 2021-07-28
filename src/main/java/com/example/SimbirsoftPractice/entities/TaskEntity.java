@@ -1,32 +1,34 @@
-package com.example.SimbirsoftPractice.rest.dto;
+package com.example.SimbirsoftPractice.entities;
 
 import com.example.SimbirsoftPractice.rest.domain.StatusTask;
-import io.swagger.v3.oas.annotations.media.Schema;
 
-@Schema(description = "Данные о задаче (from back to front)")
-public class TaskResponseDto {
-    @Schema(description = "ID задачи")
+import javax.persistence.*;
+
+@Entity
+@Table(name = "tasks")
+public class TaskEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Schema(description = "Наименование задачи")
+    @Column(nullable = false)
     private String name;
 
-    @Schema(description = "Описание задачи")
     private String description;
 
-    @Schema(description = "Создатель задачи")
-    private Long creator;
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    private UserEntity creator;
 
-    @Schema(description = "Исполнитель задачи")
-    private Long executor;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private UserEntity executor;
 
-    @Schema(description = "Релиз проекта")
-    private Long release;
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    private ReleaseEntity release;
 
-    @Schema(description = "Статус задачи")
+    @Column(name = "status", nullable = false)
+    @Enumerated(EnumType.STRING)
     private StatusTask status;
 
-    @Schema(description = "Номер доски проекта")
     private int border;
 
     public Long getId() {
@@ -53,27 +55,27 @@ public class TaskResponseDto {
         this.description = description;
     }
 
-    public Long getCreator() {
+    public UserEntity getCreator() {
         return creator;
     }
 
-    public void setCreator(Long creator) {
+    public void setCreator(UserEntity creator) {
         this.creator = creator;
     }
 
-    public Long getExecutor() {
+    public UserEntity getExecutor() {
         return executor;
     }
 
-    public void setExecutor(Long executor) {
+    public void setExecutor(UserEntity executor) {
         this.executor = executor;
     }
 
-    public Long getRelease() {
+    public ReleaseEntity getRelease() {
         return release;
     }
 
-    public void setRelease(Long release) {
+    public void setRelease(ReleaseEntity release) {
         this.release = release;
     }
 

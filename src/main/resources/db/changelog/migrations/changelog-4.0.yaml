@@ -1,0 +1,35 @@
+#Создание таблицы релизов проектов и описания к ней
+databaseChangeLog:
+  - changeSet:
+      id: 000000-create-table-releases
+      author: ${author}
+      changes:
+        - createTable:
+            tableName: releases
+            columns:
+              - column: {name: id, type: bigint, autoIncrement: true, constraints: {primaryKey: true}}
+              - column: {name: name, type: varchar(50), constraints: {nullable: true}}
+              - column: {name: start_date, type: datetime}
+              - column: {name: stop_date, type: datetime}
+              - column: {name: project_id, type: bigint, constraints: {nullable: true}}
+
+  - changeSet:
+      id: 000001-add-comments-releases
+      author: ${author}
+      changes:
+        - sql:
+            dbms: h2, postgresql
+            stripComments: true
+            sql: comment on table releases is 'Таблица хранения релизов проектов';
+
+  - changeSet:
+      id: 000002-add-foreign-key-releases_projects
+      author: ${author}
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: project_id
+            baseTableName: releases
+            constraintName: fk_releases_project
+            referencedColumnNames: id
+            referencedTableName: projects
+            validate: true

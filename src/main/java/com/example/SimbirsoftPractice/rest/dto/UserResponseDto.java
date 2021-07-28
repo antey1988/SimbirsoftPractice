@@ -27,6 +27,9 @@ public class UserResponseDto {
         this.roles = roles;
     }
 
+    public UserResponseDto() {
+    }
+
     public Long getId() {
         return id;
     }
