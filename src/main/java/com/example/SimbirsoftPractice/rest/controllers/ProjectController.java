@@ -49,12 +49,7 @@ public class ProjectController {
     @GetMapping
     @Operation(summary = "Просмотр списка проектов")
     public ResponseEntity<List<ProjectResponseDto>> readListProjects(@RequestParam(required = false) Long id) {
-        List<ProjectResponseDto> list;
-        if (id == null) {
-            list = service.readListProjects();
-        } else {
-            list = service.readListProjectsOfCustomer(id);
-        }
+        List<ProjectResponseDto> list = service.readListProjects(id);
         return ResponseEntity.ok().body(list);
     }
 

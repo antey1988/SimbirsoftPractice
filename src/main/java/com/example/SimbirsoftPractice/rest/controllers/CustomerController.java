@@ -24,7 +24,7 @@ import java.util.List;
 public class CustomerController {
 
     private final CustomerService service;
-    @Autowired
+
     public CustomerController(CustomerService customerService) {
         this.service = customerService;
     }

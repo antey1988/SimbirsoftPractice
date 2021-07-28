@@ -2,11 +2,11 @@ package com.example.SimbirsoftPractice.repos;
 
 import com.example.SimbirsoftPractice.entities.TaskEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-@Service
+@Repository
 public interface TaskRepository extends JpaRepository<TaskEntity, Long> {
     //список задач, привязанные к списку релизов
     List<TaskEntity> findAllByReleaseId(Long id);

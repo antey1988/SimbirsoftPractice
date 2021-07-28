@@ -7,9 +7,9 @@ import com.example.SimbirsoftPractice.rest.controllers.exceptions.NotFoundExcept
 import com.example.SimbirsoftPractice.rest.dto.ReleaseRequestDto;
 import com.example.SimbirsoftPractice.rest.dto.ReleaseResponseDto;
 import com.example.SimbirsoftPractice.services.ReleaseService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,7 +18,6 @@ public class ReleaseServiceImpl implements ReleaseService {
     private final ReleaseMapper mapper;
     private final ReleaseRepository repository;
 
-    @Autowired
     public ReleaseServiceImpl(ReleaseMapper mapper, ReleaseRepository repository) {
         this.mapper = mapper;
         this.repository = repository;
@@ -38,10 +37,10 @@ public class ReleaseServiceImpl implements ReleaseService {
     }
 
     @Override
+    @Transactional
     public ReleaseResponseDto updateRelease(ReleaseRequestDto releaseRequestDto, Long id) {
         ReleaseEntity releaseEntity = getOrElseThrow(id);
         releaseEntity = mapper.requestDtoToEntity(releaseRequestDto, releaseEntity);
-        releaseEntity = repository.save(releaseEntity);
         return mapper.entityToResponseDto(releaseEntity);
     }
 
@@ -59,6 +58,6 @@ public class ReleaseServiceImpl implements ReleaseService {
 
     private ReleaseEntity getOrElseThrow(Long id) {
         Optional<ReleaseEntity> ReleaseEntity = repository.findById(id);
-        return ReleaseEntity.orElseThrow(()->new NotFoundException(String.format("Релиз с id = %d не существует", id)));
+        return ReleaseEntity.orElseThrow(() -> new NotFoundException(String.format("Релиз с id = %d не существует", id)));
     }
 }

@@ -5,7 +5,6 @@ import com.example.SimbirsoftPractice.rest.dto.UserResponseDto;
 import com.example.SimbirsoftPractice.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,7 +23,7 @@ import java.util.List;
 public class UserController {
 
     private final UserService service;
-    @Autowired
+
     public UserController(UserService service) {
         this.service = service;
     }

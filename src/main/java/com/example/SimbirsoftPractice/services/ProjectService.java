@@ -10,6 +10,5 @@ public interface ProjectService {
     ProjectResponseDto readProject(Long id);
     ProjectResponseDto updateProject(ProjectRequestDto projectRequestDto, Long id);
     void deleteProject(Long id);
-    List<ProjectResponseDto> readListProjects();
-    List<ProjectResponseDto> readListProjectsOfCustomer(Long id);
+    List<ProjectResponseDto> readListProjects(Long customerId);
 }

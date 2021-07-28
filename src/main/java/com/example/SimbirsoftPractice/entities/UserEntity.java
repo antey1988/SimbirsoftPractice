@@ -13,7 +13,7 @@ import javax.persistence.EnumType;
 import javax.persistence.ElementCollection;
 import javax.persistence.CollectionTable;
 import javax.persistence.JoinColumn;
-import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -29,7 +29,7 @@ public class UserEntity {
     @CollectionTable(name = "roles", joinColumns = @JoinColumn(name = "user_id"))
     @Column(name = "role")
     @Enumerated(EnumType.STRING)
-    private List<Role> roles;
+    private Set<Role> roles;
 
     public Long getId() {
         return id;
@@ -47,11 +47,11 @@ public class UserEntity {
         this.name = name;
     }
 
-    public List<Role> getRoles() {
+    public Set<Role> getRoles() {
         return roles;
     }
 
-    public void setRoles(List<Role> roles) {
+    public void setRoles(Set<Role> roles) {
         this.roles = roles;
     }
 }

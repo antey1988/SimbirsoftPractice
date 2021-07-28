@@ -7,9 +7,9 @@ import com.example.SimbirsoftPractice.rest.controllers.exceptions.NotFoundExcept
 import com.example.SimbirsoftPractice.rest.dto.TaskRequestDto;
 import com.example.SimbirsoftPractice.rest.dto.TaskResponseDto;
 import com.example.SimbirsoftPractice.services.TaskService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,7 +18,7 @@ public class TaskServiceImpl implements TaskService {
     
     private final TaskMapper mapper;
     private final TaskRepository repository;
-    @Autowired
+
     public TaskServiceImpl(TaskMapper mapper, TaskRepository repository) {
         this.mapper = mapper;
         this.repository = repository;
@@ -38,10 +38,10 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
+    @Transactional
     public TaskResponseDto updateTask(TaskRequestDto taskRequestDto, Long id) {
         TaskEntity taskEntity = getOrElseThrow(id);
         taskEntity = mapper.requestDtoToEntity(taskRequestDto, taskEntity);
-        taskEntity = repository.save(taskEntity);
         return mapper.entityToResponseDto(taskEntity);
     }
 
@@ -53,7 +53,7 @@ public class TaskServiceImpl implements TaskService {
 
     private TaskEntity getOrElseThrow(Long id) {
         Optional<TaskEntity> TaskEntity = repository.findById(id);
-        return TaskEntity.orElseThrow(()->new NotFoundException(String.format("Задача с id = %d не существует", id)));
+        return TaskEntity.orElseThrow(() -> new NotFoundException(String.format("Задача с id = %d не существует", id)));
     }
 
     @Override

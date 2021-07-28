@@ -5,7 +5,6 @@ import com.example.SimbirsoftPractice.rest.dto.TaskResponseDto;
 import com.example.SimbirsoftPractice.services.TaskService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,8 +18,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -28,7 +25,7 @@ import java.util.List;
 @Tag(name = "Задачи", description = "Создание, изменение, удаление, просмотр списка задач")
 public class TaskController {
     private final TaskService service;
-    @Autowired
+
     public TaskController(TaskService service) {
         this.service = service;
     }

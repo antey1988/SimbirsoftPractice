@@ -10,6 +10,7 @@ import com.example.SimbirsoftPractice.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,10 +39,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public UserResponseDto updateUser(UserRequestDto userRequestDto, Long id) {
         UserEntity userEntity = getOrElseThrow(id);
         userEntity = mapper.requestDtoToEntity(userRequestDto, userEntity);
-        userEntity = repository.save(userEntity);
         return mapper.entityToResponseDto(userEntity);
     }
 
@@ -59,6 +60,6 @@ public class UserServiceImpl implements UserService {
 
     private UserEntity getOrElseThrow(Long id) {
         Optional<UserEntity> userOptional = repository.findById(id);
-        return userOptional.orElseThrow(()-> new NotFoundException(String.format("Пользователь с id = %d не существует", id)));
+        return userOptional.orElseThrow(() -> new NotFoundException(String.format("Пользователь с id = %d не существует", id)));
     }
 }
