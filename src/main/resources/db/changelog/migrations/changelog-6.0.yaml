@@ -1,0 +1,73 @@
+#Создание таблицы задач и описания к ней
+databaseChangeLog:
+  - changeSet:
+      id: 000000-add-not-null-constraint-projects
+      author: ${author}
+      changes:
+        - addNotNullConstraint:
+            columnDataType:  varchar(50)
+            columnName:  name
+            tableName:  projects
+            validate:  true
+        - addNotNullConstraint:
+            columnDataType: bigint
+            columnName: customer_id
+            tableName: projects
+            validate: true
+        - addNotNullConstraint:
+            columnDataType: varchar(30)
+            columnName: status
+            tableName: projects
+            validate: true
+
+  - changeSet:
+      id: 000001-add-not-null-constraint-releases
+      author: ${author}
+      changes:
+        - addNotNullConstraint:
+            columnDataType: varchar(50)
+            columnName: name
+            tableName: releases
+            validate: true
+        - addNotNullConstraint:
+            columnDataType: datetime
+            columnName: start_date
+            tableName: releases
+            validate: true
+        - addNotNullConstraint:
+            columnDataType: datetime
+            columnName: stop_date
+            tableName: releases
+            validate: true
+        - addNotNullConstraint:
+            columnDataType: bigint
+            columnName: project_id
+            tableName: releases
+            validate: true
+
+  - changeSet:
+      id: 000002-add-not-null-constraint-tasks
+      author: ${author}
+      changes:
+        - addNotNullConstraint:
+            columnDataType: varchar(50)
+            columnName: name
+            tableName: tasks
+            validate: true
+        - addNotNullConstraint:
+            columnDataType: bigint
+            columnName: creator_id
+            tableName: tasks
+            validate: true
+        - addNotNullConstraint:
+            columnDataType: bigint
+            columnName: release_id
+            tableName: tasks
+            validate: true
+        - addNotNullConstraint:
+            columnDataType: varchar(30)
+            columnName: status
+            tableName: tasks
+            validate: true
+
+
