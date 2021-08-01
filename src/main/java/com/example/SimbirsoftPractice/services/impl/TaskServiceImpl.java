@@ -4,6 +4,7 @@ import com.example.SimbirsoftPractice.entities.TaskEntity;
 import com.example.SimbirsoftPractice.mappers.TaskMapper;
 import com.example.SimbirsoftPractice.repos.TaskRepository;
 import com.example.SimbirsoftPractice.rest.controllers.exceptions.NotFoundException;
+import com.example.SimbirsoftPractice.rest.domain.StatusTask;
 import com.example.SimbirsoftPractice.rest.dto.TaskRequestDto;
 import com.example.SimbirsoftPractice.rest.dto.TaskResponseDto;
 import com.example.SimbirsoftPractice.services.TaskService;
@@ -57,8 +58,8 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public List<TaskResponseDto> readListTasksByReleaseId(Long id) {
-        List<TaskEntity> list = repository.findAllByReleaseId(id);
+    public List<TaskResponseDto> readListTasksByReleaseId(Long id, List<StatusTask> statuses) {
+        List<TaskEntity> list = repository.findAllByFilters(id, null, null, statuses);
         return mapper.listEntityToListResponseDto(list);
     }
 
@@ -75,8 +76,14 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public List<TaskResponseDto> readListAllTasks() {
-        List<TaskEntity> list = repository.findAll();
+    public List<TaskResponseDto> readListAllTasksByFilters(Long rId, Long cId, Long eId, List<StatusTask> statuses) {
+        List<TaskEntity> list = repository.findAllByFilters(rId, cId, eId, statuses);
         return mapper.listEntityToListResponseDto(list);
     }
+
+    @Override
+    public Long readCountTasksInProcessByProjectId(Long id) {
+        return repository.countTasksInProcessByProjectId(id, StatusTask.IN_PROGRESS);
+    }
+
 }
