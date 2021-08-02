@@ -7,6 +7,7 @@ import com.example.SimbirsoftPractice.rest.controllers.exceptions.NotFoundExcept
 import com.example.SimbirsoftPractice.rest.dto.ProjectRequestDto;
 import com.example.SimbirsoftPractice.rest.dto.ProjectResponseDto;
 import com.example.SimbirsoftPractice.services.ProjectService;
+import com.example.SimbirsoftPractice.services.ProjectValidatorService;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -15,12 +16,17 @@ import java.util.Optional;
 
 @Service
 public class ProjectServiceImpl implements ProjectService {
+
+    private static final String NOT_FOUND_PROJECT = "Проект с id = %d не существует";
+
     private final ProjectMapper mapper;
     private final ProjectRepository repository;
+    private final ProjectValidatorService validator;
 
-    public ProjectServiceImpl(ProjectMapper mapper, ProjectRepository repository) {
+    public ProjectServiceImpl(ProjectMapper mapper, ProjectRepository repository, ProjectValidatorService validator) {
         this.mapper = mapper;
         this.repository = repository;
+        this.validator = validator;
     }
 
     @Override
@@ -40,6 +46,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Transactional
     public ProjectResponseDto updateProject(ProjectRequestDto projectRequestDto, Long id) {
         ProjectEntity projectEntity = getOrElseThrow(id);
+        validator.validation(projectRequestDto, projectEntity);
         projectEntity =  mapper.requestDtoToEntity(projectRequestDto, projectEntity);
         return mapper.entityToResponseDto(projectEntity);
     }
@@ -51,12 +58,12 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public List<ProjectResponseDto> readListProjects(Long customerId) {
+    public List<ProjectResponseDto> readListProjects(Long id) {
         List<ProjectEntity> list;
-        if (customerId == null) {
+        if (id == null) {
             list = repository.findAll();
         } else {
-            list = repository.findByCustomerId(customerId);
+            list = repository.findByCustomerId(id);
         }
         return mapper.listEntityToListResponseDto(list);
     }
@@ -68,6 +75,11 @@ public class ProjectServiceImpl implements ProjectService {
 
     private ProjectEntity getOrElseThrow(Long id) {
         Optional<ProjectEntity> projectEntity = repository.findById(id);
-        return projectEntity.orElseThrow(() -> new NotFoundException(String.format("Проект с id = %d не существует", id)));
+        return projectEntity.orElseThrow(() -> new NotFoundException(String.format(NOT_FOUND_PROJECT, id)));
+    }
+
+    @Override
+    public ProjectEntity readProjectByTaskId(Long id) {
+        return repository.getProjectByTask(id);
     }
 }

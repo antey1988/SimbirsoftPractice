@@ -39,7 +39,7 @@ public class TaskController {
     }
 
     @GetMapping(value = "/tasks/{id}")
-    @Operation(summary = "Просмотр сосотояния задачи")
+    @Operation(summary = "Просмотр состояния задачи")
     public ResponseEntity<TaskResponseDto> readTask(@PathVariable Long id) {
         TaskResponseDto responseDto = service.readTask(id);
         return ResponseEntity.ok().body(responseDto);
