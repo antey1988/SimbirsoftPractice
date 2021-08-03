@@ -23,7 +23,7 @@ public class ErrorController {
         return new ResponseEntity(e.getMessage(), HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler({IllegalStateStatusException.class})
+    @ExceptionHandler({IllegalStateException.class})
     public ResponseEntity handlerIllegalStateStatusException(RuntimeException e) {
         return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
     }

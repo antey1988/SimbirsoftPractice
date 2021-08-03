@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Arrays;
 import java.util.Optional;
 
 @Service
@@ -67,6 +68,9 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public List<TaskResponseDto> readListTasksByReleaseId(Long id, List<StatusTask> statuses) {
+        if (statuses == null) {
+            statuses = Arrays.asList(StatusTask.BACKLOG, StatusTask.IN_PROGRESS);
+        }
         List<TaskEntity> list = repository.findAllByFilters(id, null, null, statuses);
         return mapper.listEntityToListResponseDto(list);
     }

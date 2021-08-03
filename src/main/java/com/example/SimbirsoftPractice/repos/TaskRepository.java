@@ -38,7 +38,8 @@ public interface TaskRepository extends JpaRepository<TaskEntity, Long> {
             "(:cId is null or t.creator.id = :cId) and " +
             "(:eId is null or t.executor.id = :eId) and " +
             "((:statuses) is null or t.status in (:statuses))")
-    List<TaskEntity> findAllByFilters(Long rId, Long cId, Long eId, @Param("statuses") List<StatusTask> statuses);
+    List<TaskEntity> findAllByFilters(@Param("rId") Long rId, @Param("cId") Long cId,
+                                      @Param("eId") Long eId, @Param("statuses") List<StatusTask> statuses);
 
 
 }
