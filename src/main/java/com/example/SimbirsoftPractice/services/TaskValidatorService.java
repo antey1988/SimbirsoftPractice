@@ -5,5 +5,5 @@ import com.example.SimbirsoftPractice.rest.dto.TaskRequestDto;
 
 public interface TaskValidatorService {
 
-    void validation(TaskRequestDto newValue, TaskEntity oldValue);
+    TaskEntity validation(TaskRequestDto newValue, TaskEntity oldValue);
 }

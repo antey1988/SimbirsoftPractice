@@ -9,6 +9,8 @@ import com.example.SimbirsoftPractice.rest.dto.TaskRequestDto;
 import com.example.SimbirsoftPractice.rest.dto.TaskResponseDto;
 import com.example.SimbirsoftPractice.services.TaskService;
 import com.example.SimbirsoftPractice.services.TaskValidatorService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -20,6 +22,8 @@ import java.util.Optional;
 public class TaskServiceImpl implements TaskService {
 
     private static final String NOT_FOUND_TASK = "Задача с id = %d не существует";
+
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private final TaskMapper mapper;
     private final TaskRepository repository;
@@ -33,10 +37,9 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public TaskResponseDto createTask(TaskRequestDto taskRequestDto) {
-        TaskEntity taskEntity = new TaskEntity();
-        validator.validation(taskRequestDto, taskEntity);
-        taskEntity = mapper.requestDtoToEntity(taskRequestDto, taskEntity);
+        TaskEntity taskEntity = validator.validation(taskRequestDto, new TaskEntity());
         taskEntity = repository.save(taskEntity);
+        logger.info("Новая запись добавлена в базу данных");
         return mapper.entityToResponseDto(taskEntity);
     }
 
@@ -50,8 +53,8 @@ public class TaskServiceImpl implements TaskService {
     @Transactional
     public TaskResponseDto updateTask(TaskRequestDto taskRequestDto, Long id) {
         TaskEntity taskEntity = getOrElseThrow(id);
-        validator.validation(taskRequestDto, taskEntity);
-        taskEntity = mapper.requestDtoToEntity(taskRequestDto, taskEntity);
+        taskEntity = validator.validation(taskRequestDto, taskEntity);
+        logger.info("Запись обновлена в базе данных");
         return mapper.entityToResponseDto(taskEntity);
     }
 
@@ -59,11 +62,18 @@ public class TaskServiceImpl implements TaskService {
     public void deleteTask(Long id) {
         getOrElseThrow(id);
         repository.deleteById(id);
+        logger.info("Запись удалена из базы данных");
     }
 
     private TaskEntity getOrElseThrow(Long id) {
+        logger.info(String.format("Попытка извлечения записи c id = %d из базы данных", id));
         Optional<TaskEntity> TaskEntity = repository.findById(id);
-        return TaskEntity.orElseThrow(() -> new NotFoundException(String.format(NOT_FOUND_TASK, id)));
+        TaskEntity entity = TaskEntity.orElseThrow(() -> {
+            logger.warn(String.format("Запись c id = %d отсутсвует в базе данных", id));
+            return new NotFoundException(String.format(NOT_FOUND_TASK, id));
+        });
+        logger.info(String.format("Запись c id = %d успешно извлечена из базы данных", id));
+        return entity;
     }
 
     @Override
@@ -72,24 +82,30 @@ public class TaskServiceImpl implements TaskService {
             statuses = Arrays.asList(StatusTask.BACKLOG, StatusTask.IN_PROGRESS);
         }
         List<TaskEntity> list = repository.findAllByFilters(id, null, null, statuses);
+        logger.info(String.format("Список записей со значением поля release_id = %d и " +
+                "status = %s извлечен из базы данных", id, statuses));
         return mapper.listEntityToListResponseDto(list);
     }
 
     @Override
     public List<TaskResponseDto> readListTasksByCreatorId(Long id) {
         List<TaskEntity> list = repository.findAllByCreatorId(id);
+        logger.info(String.format("Список записей со значением поля creator_id = %d извлечен из базы данных", id));
         return mapper.listEntityToListResponseDto(list);
     }
 
     @Override
     public List<TaskResponseDto> readListTasksByExecutorId(Long id) {
         List<TaskEntity> list = repository.findAllByExecutorId(id);
+        logger.info(String.format("Список записей со значением поля executor_id = %d извлечен из базы данных", id));
         return mapper.listEntityToListResponseDto(list);
     }
 
     @Override
     public List<TaskResponseDto> readListAllTasksByFilters(Long rId, Long cId, Long eId, List<StatusTask> statuses) {
         List<TaskEntity> list = repository.findAllByFilters(rId, cId, eId, statuses);
+        logger.info(String.format("Список записей со значением поля release_id = %d, creator_id =  %d, " +
+                "executor_id = %d и status = %s извлечен из базы данных", rId, cId, eId, statuses));
         return mapper.listEntityToListResponseDto(list);
     }
 }
