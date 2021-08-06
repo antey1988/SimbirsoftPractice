@@ -1,11 +1,10 @@
 package com.example.SimbirsoftPractice.services.impl;
 
-import com.example.SimbirsoftPractice.entities.ReleaseEntity;
-import com.example.SimbirsoftPractice.entities.TaskEntity;
-import com.example.SimbirsoftPractice.entities.UserEntity;
+import com.example.SimbirsoftPractice.entities.*;
 import com.example.SimbirsoftPractice.repos.ProjectRepository;
 import com.example.SimbirsoftPractice.rest.domain.StatusProject;
 import com.example.SimbirsoftPractice.rest.domain.StatusTask;
+import com.example.SimbirsoftPractice.rest.domain.Verificable;
 import com.example.SimbirsoftPractice.rest.domain.exceptions.IllegalStatusException;
 import com.example.SimbirsoftPractice.rest.domain.exceptions.NullValueFieldException;
 import com.example.SimbirsoftPractice.rest.dto.TaskRequestDto;
@@ -30,6 +29,8 @@ public class TaskValidatorServiceImpl implements TaskValidatorService {
     private static final String FIELD_EXECUTOR = "ИСПОЛНИТЕЛЬ";
     private static final String FIELD_CREATOR = "СОЗДАТЕЛЬ";
     private static final String FIELD_RELEASE = "РЕЛИЗ";
+    private static final StatusTask STATUS_TO_SET_EXECUTOR = StatusTask.IN_PROGRESS;
+    private static final StatusTask STATUS_DEFAULT = StatusTask.BACKLOG;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -39,87 +40,118 @@ public class TaskValidatorServiceImpl implements TaskValidatorService {
         this.repository = repository;
     }
 
-    public TaskEntity validation(TaskRequestDto newValue, TaskEntity oldValue) {
+    public TaskEntity validateInputValue(TaskRequestDto newValue, TaskEntity oldValue) {
         //other validation
-        validationNameAndDescription(newValue, oldValue);
-        validationCreator(newValue, oldValue);
-        validationRelease(newValue, oldValue);
-        validationStatus(newValue, oldValue);
-        validationExecutor(newValue, oldValue);
+        validateName(newValue, oldValue);
+        validateDescription(newValue, oldValue);
+        validateCreator(newValue, oldValue);
+        validateRelease(newValue, oldValue);
+        validateStatus(newValue, oldValue);
+        validateExecutor(newValue, oldValue);
         oldValue.setBorder(newValue.getBorder());
         //other validation
         return oldValue;
     }
 
-    private void validationNameAndDescription(TaskRequestDto newValue, TaskEntity oldValue) {
+
+    private void validateName(TaskRequestDto newValue, TaskEntity oldValue) {
         logger.debug(String.format(INFO_START_CHECK_FIELD, FIELD_NAME));
-        if (newValue.getName() == null) {
-            if (oldValue.getName() == null) {
-                logger.warn("Наименование проекта не указано. Поле обязательно для заполнения");
-                throw new NullValueFieldException(String.format(WARN_NULL_VALUE_FIELD, FIELD_NAME));
-            }
-        } else {
-            if (oldValue.getName() == null || !oldValue.getName().equals(newValue.getName())) {
-                oldValue.setName(newValue.getName());
-                logger.info(String.format(INFO_GOOD_CHECKED_FIELD, FIELD_NAME));
-
-            }
+        String oValue = oldValue.getName();
+        String nValue = newValue.getName();
+        //при создании записи поле должно быть заполнено
+        if (nValue == null && oValue == null) {
+            String text = String.format(WARN_NULL_VALUE_FIELD, FIELD_NAME);
+            logger.warn(text);
+            throw new NullValueFieldException(text);
         }
+        //при создании и обновлении записи поле измениться на новое значение,
+        //если оно отличается от старого(в том числе null)
+        if (nValue != null && !nValue.equals(oValue)) {
+            oldValue.setName(nValue);
+            logger.info(String.format(INFO_GOOD_CHECKED_FIELD, FIELD_NAME));
+        }
+    }
 
+    private void validateDescription(TaskRequestDto newValue, TaskEntity oldValue) {
         logger.debug(String.format(INFO_START_CHECK_FIELD, FIELD_DESCRIPTION));
-        if (newValue.getDescription() != null) {
-            oldValue.setDescription(newValue.getDescription());
+        String oValue = oldValue.getDescription();
+        String nValue = newValue.getDescription();
+        //при создании и обновлении записи поле измениться на новое значение,
+        //если оно отличается от старого(в том числе null)
+        if (nValue != null && !nValue.equals(oValue)) {
+            oldValue.setDescription(nValue);
             logger.info(String.format(INFO_GOOD_CHECKED_FIELD, FIELD_DESCRIPTION));
         }
     }
 
-    private void validationCreator(TaskRequestDto newValue, TaskEntity oldValue) {
+    private void validateCreator(TaskRequestDto newValue, TaskEntity oldValue) {
         logger.debug(String.format(INFO_START_CHECK_FIELD, FIELD_CREATOR));
-        if (newValue.getCreator() == null) {
-            if (oldValue.getCreator() == null) {
-                logger.warn("Создатель задачи не указан");
-                throw new NullValueFieldException(String.format(WARN_NULL_VALUE_FIELD, FIELD_CREATOR));
-            }
-        } else {
-            if (oldValue.getCreator() == null || !oldValue.getCreator().getId().equals(newValue.getCreator())) {
-                UserEntity entity = new UserEntity();
-                entity.setId(newValue.getCreator());
-                oldValue.setCreator(entity);
-                logger.info(String.format(INFO_GOOD_CHECKED_FIELD, FIELD_CREATOR));
-            }
+        UserEntity oValue = oldValue.getCreator();
+        Long nValue = newValue.getCreator();
+        if (nValue == null && oValue == null) {
+            String text = String.format(WARN_NULL_VALUE_FIELD, FIELD_CREATOR);
+            logger.warn(text);
+            throw new NullValueFieldException(text);
+        }
+        if (nValue != null && (oValue == null || !nValue.equals(oValue.getId()))) {
+            UserEntity entity = new UserEntity();
+            entity.setId(nValue);
+            oldValue.setCreator(entity);
+            logger.info(String.format(INFO_GOOD_CHECKED_FIELD, FIELD_CREATOR));
         }
     }
 
-    private void validationRelease(TaskRequestDto newValue, TaskEntity oldValue) {
+    private void validateRelease(TaskRequestDto newValue, TaskEntity oldValue) {
         logger.debug(String.format(INFO_START_CHECK_FIELD, FIELD_RELEASE));
-        if (newValue.getRelease() == null) {
-            if (oldValue.getRelease() == null) {
-                logger.warn("Релиз задачи не указан");
-                throw new NullValueFieldException(String.format(WARN_NULL_VALUE_FIELD, FIELD_RELEASE));
-            }
-        } else {
-            if (oldValue.getRelease() == null || !oldValue.getRelease().getId().equals(newValue.getRelease())) {
-                ReleaseEntity entity = new ReleaseEntity();
-                entity.setId(newValue.getRelease());
-                oldValue.setRelease(entity);
-                logger.info(String.format(INFO_GOOD_CHECKED_FIELD, FIELD_RELEASE));
-            }
+        ReleaseEntity oValue = oldValue.getRelease();
+        Long nValue = newValue.getRelease();
+        if (nValue == null && oValue == null) {
+            logger.warn("Релиз задачи не указан");
+            throw new NullValueFieldException(String.format(WARN_NULL_VALUE_FIELD, FIELD_RELEASE));
+
+        }
+        if (nValue != null && (oValue == null || !nValue.equals(oValue.getId()))) {
+            ReleaseEntity entity = new ReleaseEntity();
+            entity.setId(nValue);
+            oldValue.setRelease(entity);
+            logger.info(String.format(INFO_GOOD_CHECKED_FIELD, FIELD_RELEASE));
         }
     }
 
-    private void validationStatus(TaskRequestDto newValue, TaskEntity oldValue) {
+    private void validateStatus(TaskRequestDto newValue, TaskEntity oldValue) {
         logger.debug(String.format(INFO_START_CHECK_FIELD, FIELD_STATUS));
-        //проверка статуса, если он не был явно указан
-        if (newValue.getStatus() == null) {
-            if (oldValue.getStatus() == null) {
-                logger.info(String.format(INFO_GOOD_CHECKED_FIELD, FIELD_STATUS));
-                oldValue.setStatus(StatusTask.BACKLOG);
-            }
+
+        Verificable oValue = oldValue.getStatus();
+        Verificable nValue = newValue.getStatus();
+        //установка начального статуса, если он не было явно указан
+        if (nValue == null && oValue == null) {
+            logger.info(String.format(INFO_GOOD_CHECKED_FIELD, FIELD_STATUS));
+            oldValue.setStatus(STATUS_DEFAULT);
             return;
         }
         //проверка явно указанного статуса
         //если статус такой же, то завершаем проверку
+        if (nValue != null && nValue != oValue) {
+            //проверка на попытку перехода в статус с более низким рангом, что запрещено
+            if (nValue.getRank() < oValue.getRank()) {
+                String text = String.format(WARN_CHANGE_STATUS, oldValue.getStatus(), newValue.getStatus());
+                logger.warn(text);
+                throw new IllegalStatusException(text);
+            }
+            //дополнительная проверка, если статус требует этого
+            if (nValue.isVerificable()) {
+                validateStatusAdditionally(nValue.getNumberVerification(), oldValue.getId(), StatusTask.DONE);
+            }
+            oldValue.setStatus(nValue.getEnum());
+
+            logger.info(String.format(INFO_GOOD_CHECKED_FIELD, FIELD_STATUS));
+        }
+
+
         if (newValue.getStatus() != oldValue.getStatus()) {
+
+
+
             logger.info("Извлечение информации о проекте, к которому прикреплена задача");
             StatusProject statusProject = repository.getProjectByTask(oldValue.getId()).getStatus();
             logger.info(String.format("Проект находиться в статусе %s", statusProject));
@@ -171,21 +203,22 @@ public class TaskValidatorServiceImpl implements TaskValidatorService {
         }
     }
 
-    private void validationExecutor(TaskRequestDto newValue, TaskEntity oldValue) {
+    private void validateExecutor(TaskRequestDto newValue, TaskEntity oldValue) {
         logger.debug(String.format(INFO_START_CHECK_FIELD, FIELD_EXECUTOR));
-        if (newValue.getExecutor() == null) {
-            if (oldValue.getExecutor() == null && oldValue.getStatus() != StatusTask.BACKLOG) {
-                logger.warn(String.format("Исполнитель задачи не указан. " +
-                        "Для задачи в статусе %s поле исполнитель обязательно для заполнения", newValue.getStatus()));
-                throw new NullValueFieldException(String.format(WARN_NULL_VALUE_FIELD, FIELD_EXECUTOR));
-            }
-        } else {
-            if (oldValue.getExecutor() == null || !oldValue.getExecutor().getId().equals(newValue.getCreator())) {
-                UserEntity entity = new UserEntity();
-                entity.setId(newValue.getExecutor());
-                oldValue.setExecutor(entity);
-                logger.info(String.format(INFO_GOOD_CHECKED_FIELD, FIELD_EXECUTOR));
-            }
+        UserEntity oValue = oldValue.getExecutor();
+        Long nValue = newValue.getExecutor();
+        Verificable status = oldValue.getStatus();
+        if (nValue == null && oValue == null && status.getRank() >= STATUS_TO_SET_EXECUTOR.getRank()) {
+            String text = String.format(WARN_NULL_VALUE_FIELD, FIELD_EXECUTOR);
+            logger.warn(text);
+            throw new NullValueFieldException(text);
+
+        }
+        if (nValue != null && (oValue == null || !nValue.equals(oValue.getId()))) {
+            UserEntity entity = new UserEntity();
+            entity.setId(newValue.getExecutor());
+            oldValue.setExecutor(entity);
+            logger.info(String.format(INFO_GOOD_CHECKED_FIELD, FIELD_EXECUTOR));
         }
     }
 }

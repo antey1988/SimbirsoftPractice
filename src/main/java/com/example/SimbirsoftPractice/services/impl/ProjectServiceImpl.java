@@ -34,7 +34,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public ProjectResponseDto createProject(ProjectRequestDto projectRequestDto) {
-        ProjectEntity projectEntity = validator.validation(projectRequestDto, new ProjectEntity());
+        ProjectEntity projectEntity = validator.validateInputValue(projectRequestDto, new ProjectEntity());
         projectEntity = repository.save(projectEntity);
         logger.info("Новая запись добавлена в базу данных");
         return mapper.entityToResponseDto(projectEntity);
@@ -50,7 +50,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Transactional
     public ProjectResponseDto updateProject(ProjectRequestDto projectRequestDto, Long id) {
         ProjectEntity projectEntity = getOrElseThrow(id);
-        projectEntity =  validator.validation(projectRequestDto, projectEntity);
+        projectEntity =  validator.validateInputValue(projectRequestDto, projectEntity);
         return mapper.entityToResponseDto(projectEntity);
     }
 

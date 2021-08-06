@@ -9,5 +9,5 @@ import com.example.SimbirsoftPractice.rest.dto.ProjectRequestDto;
 
 public interface ProjectValidatorService {
 
-    ProjectEntity validation(ProjectRequestDto newValue, ProjectEntity oldValue);
+    ProjectEntity validateInputValue(ProjectRequestDto newValue, ProjectEntity oldValue);
 }

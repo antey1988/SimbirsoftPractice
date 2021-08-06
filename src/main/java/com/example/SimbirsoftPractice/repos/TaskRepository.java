@@ -11,12 +11,11 @@ import java.util.List;
 
 @Repository
 public interface TaskRepository extends JpaRepository<TaskEntity, Long> {
-//    //список задач, привязанные к релизу с возможностью фильтрации по статусу,
-//    //пустой список статусов означает все возможные статусы
-//    @Query(value = "select t from TaskEntity t " +
-//            "join t.release r " +
-//            "where p.id = :id and (:statuses is null or t.status in :statuses)")
-//    List<TaskEntity> findAllByReleaseId(Long id, List<StatusTask> statuses);
+    //список задач, привязанные к релизу с возможностью фильтрации по статусу,
+    //пустой список статусов означает все возможные статусы
+    @Query(value = "select t from TaskEntity t " +
+            "where t.release.id = :id and ((:statuses) is null or t.status in (:statuses))")
+    List<TaskEntity> findAllByReleaseId(Long id, List<StatusTask> statuses);
 
     //список задач, созданных указанным пользователем
     List<TaskEntity> findAllByCreatorId(Long id);

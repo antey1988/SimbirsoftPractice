@@ -18,7 +18,7 @@ public class ErrorController {
         return new ResponseEntity(e.toString(), HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler({NotFoundException.class})
+    @ExceptionHandler(NotFoundException.class)
     public ResponseEntity handlerNotFoundException(RuntimeException e) {
         return new ResponseEntity(e.getMessage(), HttpStatus.NOT_FOUND);
     }

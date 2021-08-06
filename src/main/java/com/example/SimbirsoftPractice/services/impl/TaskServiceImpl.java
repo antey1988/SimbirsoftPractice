@@ -37,7 +37,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public TaskResponseDto createTask(TaskRequestDto taskRequestDto) {
-        TaskEntity taskEntity = validator.validation(taskRequestDto, new TaskEntity());
+        TaskEntity taskEntity = validator.validateInputValue(taskRequestDto, new TaskEntity());
         taskEntity = repository.save(taskEntity);
         logger.info("Новая запись добавлена в базу данных");
         return mapper.entityToResponseDto(taskEntity);
@@ -53,7 +53,7 @@ public class TaskServiceImpl implements TaskService {
     @Transactional
     public TaskResponseDto updateTask(TaskRequestDto taskRequestDto, Long id) {
         TaskEntity taskEntity = getOrElseThrow(id);
-        taskEntity = validator.validation(taskRequestDto, taskEntity);
+        taskEntity = validator.validateInputValue(taskRequestDto, taskEntity);
         logger.info("Запись обновлена в базе данных");
         return mapper.entityToResponseDto(taskEntity);
     }
@@ -78,10 +78,10 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public List<TaskResponseDto> readListTasksByReleaseId(Long id, List<StatusTask> statuses) {
-        if (statuses == null) {
+        if (statuses == null || statuses.isEmpty()){
             statuses = Arrays.asList(StatusTask.BACKLOG, StatusTask.IN_PROGRESS);
         }
-        List<TaskEntity> list = repository.findAllByFilters(id, null, null, statuses);
+        List<TaskEntity> list = repository.findAllByReleaseId(id,  statuses);
         logger.info(String.format("Список записей со значением поля release_id = %d и " +
                 "status = %s извлечен из базы данных", id, statuses));
         return mapper.listEntityToListResponseDto(list);
