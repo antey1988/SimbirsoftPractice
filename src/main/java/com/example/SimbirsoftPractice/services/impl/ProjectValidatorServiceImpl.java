@@ -5,7 +5,6 @@ import com.example.SimbirsoftPractice.entities.ProjectEntity;
 import com.example.SimbirsoftPractice.repos.TaskRepository;
 import com.example.SimbirsoftPractice.rest.domain.StatusProject;
 import com.example.SimbirsoftPractice.rest.domain.StatusTask;
-import com.example.SimbirsoftPractice.rest.domain.Verificable;
 import com.example.SimbirsoftPractice.rest.domain.exceptions.IllegalStatusException;
 import com.example.SimbirsoftPractice.rest.domain.exceptions.NullValueFieldException;
 import com.example.SimbirsoftPractice.rest.dto.ProjectRequestDto;
@@ -108,8 +107,8 @@ public class ProjectValidatorServiceImpl implements ProjectValidatorService {
     private void validateStatus(ProjectRequestDto newValue, ProjectEntity oldValue) {
         logger.debug(String.format(INFO_START_CHECK_FIELD, FIELD_STATUS));
 
-        Verificable oValue = oldValue.getStatus();
-        Verificable nValue = newValue.getStatus();
+        StatusProject oValue = oldValue.getStatus();
+        StatusProject nValue = newValue.getStatus();
         //установка начального статуса, если он не было явно указан
         if (nValue == null && oValue == null) {
             logger.info(String.format(INFO_GOOD_CHECKED_FIELD, FIELD_STATUS));
@@ -120,17 +119,18 @@ public class ProjectValidatorServiceImpl implements ProjectValidatorService {
         //если статус такой же, то завершаем проверку
         if (nValue != null && nValue != oValue) {
             //проверка на попытку перехода в статус с более низким рангом, что запрещено
-            if (nValue.getRank() < oValue.getRank()) {
+            if (nValue.ordinal() < oValue.ordinal()) {
                 String text = String.format(WARN_CHANGE_STATUS, oldValue.getStatus(), newValue.getStatus());
                 logger.warn(text);
                 throw new IllegalStatusException(text);
             }
             //дополнительная проверка, если статус требует этого
-            if (nValue.isVerificable()) {
-                validateStatusAdditionally(nValue.getNumberVerification(), oldValue.getId(), StatusTask.DONE);
+            if (nValue == StatusProject.CLOSED) {
+                validateNotDoneTasks(oldValue.getId());
+            } else if (nValue == StatusProject.OPEN) {
+                validateNotDoneTasks(oldValue.getCustomer().getId());
             }
-            oldValue.setStatus(nValue.getEnum());
-
+            oldValue.setStatus(nValue);
             logger.info(String.format(INFO_GOOD_CHECKED_FIELD, FIELD_STATUS));
         }
     }
@@ -139,9 +139,9 @@ public class ProjectValidatorServiceImpl implements ProjectValidatorService {
         logger.debug(String.format(INFO_START_CHECK_FIELD, FIELD_START_DATE));
         Date oValue = oldValue.getStartDate();
         Date nValue = newValue.getStartDate();
-        Verificable status = oldValue.getStatus();
+        StatusProject status = oldValue.getStatus();
         //если дата не установлена явно и статус этого требует, то ставим текущую дату
-        if (status.getRank() >= STATUS_TO_SET_START_DATA.getRank() && nValue == null && oValue == null) {
+        if (status.ordinal() >= STATUS_TO_SET_START_DATA.ordinal() && nValue == null && oValue == null) {
             oldValue.setStartDate(new Date());
             logger.info(String.format(INFO_GOOD_CHECKED_FIELD, FIELD_START_DATE));
             return;
@@ -157,35 +157,29 @@ public class ProjectValidatorServiceImpl implements ProjectValidatorService {
         logger.debug(String.format(INFO_START_CHECK_FIELD, FIELD_STOP_DATE));
         Date oValue = oldValue.getStopDate();
         Date nValue = newValue.getStopDate();
-        Verificable status = oldValue.getStatus();
-        //если дата не установлена явно и статус этого требует, то ставим текущую дату
-        if (status.getRank() == STATUS_TO_SET_STOP_DATA.getRank() && nValue == null && oValue == null) {
-            oldValue.setStopDate(new Date());
+        StatusProject status = oldValue.getStatus();
+        //если дата установлена явно, то используем это значение
+        if (nValue != null)  {
+            oldValue.setStopDate(nValue);
             logger.info(String.format(INFO_GOOD_CHECKED_FIELD, FIELD_STOP_DATE));
             return;
         }
-        if (nValue != null)  {
-            //если дата установлена явно, то используем это значение
-            oldValue.setStopDate(newValue.getStopDate());
+        //если дата не установлена явно и статус этого требует, то ставим текущую дату
+        if (status.ordinal() == STATUS_TO_SET_STOP_DATA.ordinal() && oValue == null) {
+            oldValue.setStopDate(new Date());
             logger.info(String.format(INFO_GOOD_CHECKED_FIELD, FIELD_STOP_DATE));
         }
     }
 
-    private void validateStatusAdditionally(int numberVerification, Object ... args) {
-        switch (numberVerification) {
-            case 2: {
-                Long id = (Long) args[0];
-                StatusTask status = (StatusTask) args[1];
-                Long count = taskRepository.countTasksInProcessByProjectId(id, status);// StatusTask.DONE);
-                if (count != 0) {
-                    logger.warn(WARN_CLOSE_PROJECT);
-                    throw new IllegalStatusException(WARN_CLOSE_PROJECT);
-                }
-                break;
-            }
-            case 1: {
-                //логика платности
-            }
+    private void validateNotDoneTasks(Long projectId) {
+        Long count = taskRepository.countTasksInProcessByProjectId(projectId, StatusTask.DONE);
+        if (count != 0) {
+            logger.warn(WARN_CLOSE_PROJECT);
+            throw new IllegalStatusException(WARN_CLOSE_PROJECT);
         }
+    }
+
+    private void validateBankAccountCustomer(Long customerId) {
+
     }
 }

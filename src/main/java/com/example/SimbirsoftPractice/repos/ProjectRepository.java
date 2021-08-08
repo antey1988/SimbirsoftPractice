@@ -13,7 +13,6 @@ public interface ProjectRepository extends JpaRepository<ProjectEntity, Long> {
 
     @Query(value = "select p from ProjectEntity p " +
             "where p.id = (select r.project.id from ReleaseEntity r " +
-            "where r.id = (select t.release.id from TaskEntity t " +
-            "where t.id = :taskId))")
-    ProjectEntity getProjectByTask(Long taskId);
+            "where r.id = :releaseId)")
+    ProjectEntity getProjectByRelease(Long releaseId);
 }
