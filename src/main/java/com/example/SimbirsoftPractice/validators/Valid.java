@@ -10,6 +10,5 @@ import java.lang.reflect.Method;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Valid {
     String field();
-    String method();
     TypeValid type() default TypeValid.BOTH;
 }

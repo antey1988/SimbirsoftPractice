@@ -7,6 +7,7 @@ import com.example.SimbirsoftPractice.rest.controllers.exceptions.NotFoundExcept
 import com.example.SimbirsoftPractice.rest.dto.CustomerRequestDto;
 import com.example.SimbirsoftPractice.rest.dto.CustomerResponseDto;
 import com.example.SimbirsoftPractice.services.CustomerService;
+import com.example.SimbirsoftPractice.services.CustomerValidatorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -21,11 +22,19 @@ public class CustomerServiceImpl implements CustomerService {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final CustomerRepository repository;
     private final CustomerMapper mapper;
+    private final CustomerValidatorService validator;
 
-    public CustomerServiceImpl(CustomerRepository customerRepository, CustomerMapper customerMapper) {
+    public CustomerServiceImpl(CustomerRepository customerRepository,
+                               CustomerMapper customerMapper, CustomerValidatorService validator) {
         this.repository = customerRepository;
         this.mapper = customerMapper;
+        this.validator = validator;
     }
+//    public CustomerServiceImpl(CustomerRepository customerRepository,
+//                               CustomerMapper customerMapper) {
+//        this.repository = customerRepository;
+//        this.mapper = customerMapper;
+//    }
 
     @Override
     public CustomerResponseDto readCustomer(Long id) {
@@ -35,7 +44,8 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public CustomerResponseDto createCustomer(CustomerRequestDto customerRequestDto) {
-        CustomerEntity customerEntity = mapper.requestDtoToEntity(customerRequestDto, new CustomerEntity());
+//        CustomerEntity customerEntity = mapper.requestDtoToEntity(customerRequestDto, new CustomerEntity());
+        CustomerEntity customerEntity = validator.validateOnCreation(customerRequestDto, new CustomerEntity());
         customerEntity = repository.save(customerEntity);
         logger.info("Новая запись добавлена в базу данных");
         return mapper.entityToResponseDto(customerEntity);

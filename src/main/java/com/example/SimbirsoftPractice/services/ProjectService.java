@@ -13,5 +13,5 @@ public interface ProjectService {
     ProjectResponseDto updateProject(ProjectRequestDto projectRequestDto, Long id);
     void deleteProject(Long id);
     List<ProjectResponseDto> readListProjects(Long id);
-    ProjectEntity readProjectByTaskId(Long id);
+//    ProjectEntity readProjectByTaskId(Long id);
 }

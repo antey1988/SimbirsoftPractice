@@ -4,6 +4,7 @@ import com.example.SimbirsoftPractice.rest.controllers.exceptions.NotFoundExcept
 import com.example.SimbirsoftPractice.rest.controllers.exceptions.TestRuntimeException;
 import com.example.SimbirsoftPractice.rest.domain.exceptions.IllegalStatusException;
 import com.example.SimbirsoftPractice.rest.domain.exceptions.NullValueFieldException;
+import com.example.SimbirsoftPractice.rest.domain.exceptions.NullValueObjectException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -23,7 +24,7 @@ public class ErrorController {
         return new ResponseEntity(e.getMessage(), HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler({IllegalStatusException.class, NullValueFieldException.class})
+    @ExceptionHandler({IllegalStatusException.class, NullValueFieldException.class, NullValueObjectException.class})
     public ResponseEntity handlerIllegalStateStatusException(RuntimeException e) {
         return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
     }

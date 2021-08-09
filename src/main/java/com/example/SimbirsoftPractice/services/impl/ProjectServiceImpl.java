@@ -85,8 +85,8 @@ public class ProjectServiceImpl implements ProjectService {
         return entity;
     }
 
-    @Override
-    public ProjectEntity readProjectByTaskId(Long id) {
-        return repository.getProjectByTask(id);
-    }
+//    @Override
+//    public ProjectEntity readProjectByTaskId(Long id) {
+//        return repository.getProjectByTask(id);
+//    }
 }

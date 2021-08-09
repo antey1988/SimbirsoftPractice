@@ -4,12 +4,13 @@ import com.example.SimbirsoftPractice.rest.domain.exceptions.NullValueFieldExcep
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.persistence.Id;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.Map;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Arrays;
 import java.util.stream.Collectors;
 
 public abstract class BaseValidator<DTO, ENTITY> {
@@ -17,25 +18,51 @@ public abstract class BaseValidator<DTO, ENTITY> {
     private static final String WARN_NULL_VALUE_FIELD = "Поле %s должно быть заполнено";
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private Class<?> dto ;
-    private Class<?> entity;
-    protected Set< FieldValidator> methodsOnCreation = new HashSet<>();
-    protected Set< FieldValidator> methodsOnUpdate = new HashSet<>();
+    protected Set<MethodValidation> methodsOnCreation = new HashSet<>();
+    protected Set<MethodValidation> methodsOnUpdate = new HashSet<>();
 
-    public BaseValidator(Class<?> dto, Class<?> entity) throws NoSuchMethodException {
-        Map<String, Field> fields = Arrays.stream(entity.getFields()).collect(Collectors.toMap(Field::getName, f->f));
+    public BaseValidator(Class<DTO> dto, Class<ENTITY> entity) throws NoSuchMethodException, NoSuchFieldException {
+        //ссылки на методы проверки по умолчанию (при создании и обновлении)
+        Method defaultMethodNotNullField = this.getClass().getMethod("validateNotNullFieldDefault",
+                Object.class, Object.class, Field.class, Field.class);
+        Method defaultMethodMayBeNullField = this.getClass().getMethod("validateMayBeNullFieldDefault",
+                Object.class, Object.class, Field.class, Field.class);
+        //все поля в классе сущности и классе дто
+        Map<String, Field> fieldsEntity = Arrays.stream(entity.getDeclaredFields())
+                .filter(f->!f.getName().equals("id")).collect(Collectors.toMap(Field::getName, f->f));
+        Map<String, Field> fieldsDto = Arrays.stream(dto.getDeclaredFields())
+                .collect(Collectors.toMap(Field::getName, f->f));   
+        //для каждого поля из класса сущности ищем соответствующее поле в классе дто,
+        //если не найдено бросаем исключение
+        for (Map.Entry<String, Field> field : fieldsEntity.entrySet()) {
+            String fieldName = field.getKey();
+            if (!fieldsDto.containsKey(fieldName)) {
+                String text = String.format("Для целевого поля %s из класса %s не найдено соответствующее поле c таким же именем в классе %s",
+                        fieldName, entity, dto);
+                        logger.error(text);
+                throw new NoSuchFieldException(text);
+            }
+            //добавляем класс с методом проверки по умолчанию,
+            //передавая в параметрах поля-источник и поле-цель
+            if (field.getValue().isAnnotationPresent(NotNull.class)) {
+                methodsOnCreation.add(new MethodValidation(fieldName, defaultMethodNotNullField, fieldsDto.get(fieldName), field.getValue()));
+            } else {
+                methodsOnCreation.add(new MethodValidation(fieldName, defaultMethodMayBeNullField, fieldsDto.get(fieldName), field.getValue()));
+            }
+            methodsOnUpdate.add(new MethodValidation(fieldName, defaultMethodMayBeNullField, fieldsDto.get(fieldName), field.getValue()));
+        }
+        //поиск методов, в которых самостоятельно описана проверка полей
         for (Method method : this.getClass().getMethods()) {
             if (method.isAnnotationPresent(Valid.class)) {
                 Valid valid = method.getAnnotation(Valid.class);
-                String field = valid.field();
-                if (!fields.containsKey(valid.field())) {
-                    logger.warn(String.format("В классе %s нет поля с наименованием %s", entity, field));
+                String fieldName = valid.field();
+                if (!fieldsEntity.containsKey(valid.field())) {
+                    logger.warn(String.format("В классе %s нет поля с наименованием %s", entity, fieldName));
                     continue;
                 }
-                fields.remove(field);
                 TypeValid typeValid = valid.type();
-                FieldValidator fieldValidator = new FieldValidator(method);
-                if (typeValid == TypeValid.BOTH) {
+                MethodValidation fieldValidator = new MethodValidation(fieldName, method);
+                if (typeValid == TypeValid.BOTH) {                    
                     methodsOnCreation.add(fieldValidator);
                     methodsOnUpdate.add(fieldValidator);
                 } else if (typeValid == TypeValid.ON_CREATION) {
@@ -46,89 +73,91 @@ public abstract class BaseValidator<DTO, ENTITY> {
             }
         }
 
-        for (Field field : fields.values()) {
-            boolean isCreate
-        }
-
     }
 
-
-    protected Object validateOnCreation(Object source, Object target) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-
-        Map<String, String> methodsOnCreation = new HashMap<>();
-        Method method = this.getClass().getMethod("validateOnCreation", Object.class, Object.class);
-        for (Annotation annotation : method.getAnnotations()) {
-            if (annotation instanceof Valid){
-                Valid valid = (Valid) annotation;
-                methodsOnCreation.put(valid.field(), valid.method());
+    public ENTITY validateOnCreation(DTO dto, ENTITY entity) {
+        System.out.println("");
+        methodsOnCreation.forEach(m-> {
+            try {
+                m.invoke(dto, entity);
+            } catch (InvocationTargetException | IllegalAccessException e) {
+                e.printStackTrace();
             }
-        }
-
-        for(Field field : target.getClass().getDeclaredFields()) {
-
-            if (field.isAnnotationPresent(Id.class)) {
-                continue;
-            }
-
-            String fieldName = field.getName();
-            if (methodsOnCreation.containsKey(fieldName)) {
-                method = this.getClass().getMethod(methodsOnCreation.get(fieldName), Object.class, Object.class);
-                method.invoke(this, source, target);
-                continue;
-            }
-
-            Method getter = source.getClass().getMethod(String.format("get%s%s", fieldName.substring(0, 1).toUpperCase(), fieldName.substring(1)));
-            Method setter = target.getClass().getMethod(String.format("set%s%s", fieldName.substring(0, 1).toUpperCase(), fieldName.substring(1)), Object.class);
-            if (field.isAnnotationPresent(NotNullOnCreation.class)) {
-//                Method getter = source.getClass().getMethod(String.format("get%s%s", fieldName.substring(0, 1).toUpperCase(), fieldName.substring(1)));
-                Class<?> clazz = getter.getReturnType();
-            }
-
-        }
-        return target;
-    }
-    protected ENTITY validateOnUpdate(DTO source, ENTITY target) {
-        return target;
-
+        });
+        return entity;
     }
 
-    private void validateField(Object source, Object target, Method getter, Method setter, boolean isCreate)
-            throws InvocationTargetException, IllegalAccessException, InstantiationException, NoSuchMethodException {
-        Object fromSource = getter.invoke(source);
-        //если создание и поле пустое, сообщаем об обязательности заполнения
-        if (fromSource == null && isCreate) {
+    //стандартный метод проверки обязательного поля
+    public final void validateNotNullFieldDefault(DTO source, DTO target, Field fieldSource, Field fieldTarget)
+            throws NoSuchFieldException, IllegalAccessException, InstantiationException {
+        fieldSource.setAccessible(true);
+        Object valueSource = fieldSource.get(source);
+        if (valueSource == null) {
             String text = String.format(WARN_NULL_VALUE_FIELD, "fdf");
             logger.warn(text);
             throw new NullValueFieldException(text);
         }
-        //если обновление и поле пустое, то заканчиваем проверку
-        if (fromSource == null) {
+        setFromSourceToTarget(source, target, fieldSource, fieldTarget);
+    }
+    //стандартный метод проверки не обязательного поля
+    public final void validateMayBeNullFieldDefault(DTO source, ENTITY target, Field fieldSource, Field fieldTarget)
+            throws NoSuchFieldException, IllegalAccessException, InstantiationException {
+        fieldSource.setAccessible(true);
+        Object valueSource = fieldSource.get(source);
+        if (valueSource == null) {
             return;
         }
-
-        Class<?> typeFieldInSource = getter.getReturnType();
-        Class<?> typeFieldInTarget = setter.getParameterTypes()[0];
-        Object newValue;
+        setFromSourceToTarget(source, target, fieldSource, fieldTarget);
+    }
+    //метод заполнения или обновление поля, если новое значение не null
+    private void setFromSourceToTarget(Object source, Object target, Field fieldSource, Field fieldTarget)
+            throws IllegalAccessException, InstantiationException, NoSuchFieldException {
+        fieldSource.setAccessible(true);
+        Object valueSource = fieldSource.get(source);
+        Class<?> typeFieldInSource = fieldSource.getType();
+        Class<?> typeFieldInTarget = fieldTarget.getType();
+        Object valueTarget;
         if (!typeFieldInTarget.equals(typeFieldInSource)) {
-            newValue = typeFieldInTarget.newInstance();
-            newValue.getClass().getMethod("setId", typeFieldInSource).invoke(newValue, fromSource);
-        } else {
-            newValue = fromSource;
+            valueTarget = typeFieldInTarget.newInstance();
+            Field id = typeFieldInTarget.getField("id");
+            id.setAccessible(true);
+            id.set(valueTarget, valueSource);
+            valueSource = valueTarget;
         }
-        setter.invoke(target, newValue);
+        fieldTarget.setAccessible(true);
+        fieldTarget.set(target, valueSource);
     }
 
-    private class FieldValidator{
+    private class MethodValidation {
+        private final String fieldName;
         private final Method methodValidation;
         private final Object[] args;
 
-        private FieldValidator(Method methodValidation, Object ... args) {
+        private MethodValidation(String fieldName, Method methodValidation, Object ... args) {
+            this.fieldName = fieldName;
             this.methodValidation = methodValidation;
-            this.args = args;
+            this.args = args == null ? new Object[2] : new Object[]{null, null, args[0], args[1]};
         }
 
-        private void invoke(Object source, Object target) throws InvocationTargetException, IllegalAccessException {
-            methodValidation.invoke(BaseValidator.this, source, target, args);
+        private void invoke(DTO source, ENTITY target) throws InvocationTargetException, IllegalAccessException {
+            args[0] = source;
+            args[1] = target;
+            methodValidation.invoke(BaseValidator.this, args);
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            MethodValidation that = (MethodValidation) o;
+
+            return fieldName.equals(that.fieldName);
+        }
+
+        @Override
+        public int hashCode() {
+            return fieldName.hashCode();
         }
     }
 
