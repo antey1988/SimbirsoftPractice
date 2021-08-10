@@ -1,0 +1,42 @@
+databaseChangeLog:
+  #Удаление всех ранее созданных задач
+  - changeSet:
+      id: 000000-delete-all-test-tasks
+      author: ${author}
+      changes:
+        - sql:
+            dbms: h2, postgresql
+            stripComments: true
+            sql: delete from tasks;
+  #Удаление всех ролей пользователей
+  - changeSet:
+      id: 000001-delete-all-roles
+      author: ${author}
+      changes:
+        - sql:
+            dbms: h2, postgresql
+            stripComments: true
+            sql: delete from roles;
+  #Удаление всех ранее созданных пользователей
+  - changeSet:
+      id: 000002-delete-all-users
+      author: ${author}
+      changes:
+        - sql:
+            dbms: h2, postgresql
+            stripComments: true
+            sql: delete from users;
+  #Создание столбца password в таблице users
+  - changeSet:
+      id: 000003-add-column-password-to-users
+      author: ${author}
+      changes:
+        - addColumn:
+            tableName: users
+            columns:
+              - column:
+                  name: password
+                  type: varchar
+                  constraints:
+                    nullable: false
+

@@ -88,7 +88,7 @@ public abstract class BaseValidator<DTO, ENTITY> {
     }
 
     //стандартный метод проверки обязательного поля
-    public final void validateNotNullFieldDefault(DTO source, DTO target, Field fieldSource, Field fieldTarget)
+    public final void validateNotNullFieldDefault(DTO source, ENTITY target, Field fieldSource, Field fieldTarget)
             throws NoSuchFieldException, IllegalAccessException, InstantiationException {
         fieldSource.setAccessible(true);
         Object valueSource = fieldSource.get(source);

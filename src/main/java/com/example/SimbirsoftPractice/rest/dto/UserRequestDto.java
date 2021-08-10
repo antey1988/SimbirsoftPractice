@@ -8,6 +8,8 @@ import java.util.List;
 public class UserRequestDto {
     @Schema(description = "Имя пользователя")
     private String name;
+    @Schema(description = "Пароль пользователя")
+    private String password;
     @Schema(description = "Роли пользователя")
     private List<Role> roles;
 
@@ -17,6 +19,14 @@ public class UserRequestDto {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public List<Role> getRoles() {
