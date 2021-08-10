@@ -7,6 +7,8 @@ import com.example.SimbirsoftPractice.rest.controllers.exceptions.NotFoundExcept
 import com.example.SimbirsoftPractice.rest.dto.UserRequestDto;
 import com.example.SimbirsoftPractice.rest.dto.UserResponseDto;
 import com.example.SimbirsoftPractice.services.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +18,9 @@ import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
+
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
     private final UserRepository repository;
     private final UserMapper mapper;
 
@@ -35,6 +40,7 @@ public class UserServiceImpl implements UserService {
     public UserResponseDto createUser(UserRequestDto userRequestDto) {
         UserEntity userEntity = mapper.requestDtoToEntity(userRequestDto, new UserEntity());
         userEntity = repository.save(userEntity);
+        logger.info("Новая запись добавлена в базу данных");
         return mapper.entityToResponseDto(userEntity);
     }
 
@@ -43,6 +49,7 @@ public class UserServiceImpl implements UserService {
     public UserResponseDto updateUser(UserRequestDto userRequestDto, Long id) {
         UserEntity userEntity = getOrElseThrow(id);
         userEntity = mapper.requestDtoToEntity(userRequestDto, userEntity);
+        logger.info("Запись обновлена в базе данных");
         return mapper.entityToResponseDto(userEntity);
     }
 
@@ -50,16 +57,24 @@ public class UserServiceImpl implements UserService {
     public void deleteUser(Long id) {
         UserEntity userEntity = getOrElseThrow(id);
         repository.deleteById(id);
+        logger.info("Запись удалена из базы данных");
     }
 
     @Override
     public List<UserResponseDto> getListUsers() {
         List<UserEntity> list = repository.findAll();
+        logger.info("Список записей извлечен из базы данных");
         return mapper.listEntityToListResponseDto(list);
     }
 
     private UserEntity getOrElseThrow(Long id) {
+        logger.info(String.format("Попытка извлечения записи c id = %d из базы данных", id));
         Optional<UserEntity> userOptional = repository.findById(id);
-        return userOptional.orElseThrow(() -> new NotFoundException(String.format("Пользователь с id = %d не существует", id)));
+        UserEntity entity = userOptional.orElseThrow(() -> {
+            logger.warn(String.format("Запись c id = %d отсутсвует в базе данных", id));
+            return new NotFoundException(String.format("Пользователь с id = %d не существует", id));
+        });
+        logger.info(String.format("Запись c id = %d успешно извлечена из базы данных", id));
+        return entity;
     }
 }

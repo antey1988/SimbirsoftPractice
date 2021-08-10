@@ -15,7 +15,7 @@ public interface ProjectMapper {
 
     List<ProjectResponseDto> listEntityToListResponseDto(List<ProjectEntity> listProjectEntity);
 
-    @Mapping(target = "customer", ignore = true)
+    /*@Mapping(target = "customer", ignore = true)
     ProjectEntity requestDtoToEntity(ProjectRequestDto projectRequestDto,
                                      @MappingTarget ProjectEntity projectEntity);
 
@@ -25,5 +25,5 @@ public interface ProjectMapper {
         CustomerEntity entity = new CustomerEntity();
         entity.setId(projectRequestDto.getCustomer());
         projectEntity.setCustomer(entity);
-    }
+    }*/
 }

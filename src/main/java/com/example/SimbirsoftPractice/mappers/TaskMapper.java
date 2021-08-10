@@ -13,14 +13,22 @@ import java.util.List;
 public interface TaskMapper {
     @Mappings({
             @Mapping(target = "creator", expression = "java(taskEntity.getCreator().getId())"),
-            @Mapping(target = "executor", expression = "java(taskEntity.getExecutor().getId())"),
+            @Mapping(target = "executor", source = "executor", qualifiedByName = "getIdFromExecutor"),
             @Mapping(target = "release", expression = "java(taskEntity.getRelease().getId())")
     })
     TaskResponseDto entityToResponseDto(TaskEntity taskEntity);
 
     List<TaskResponseDto> listEntityToListResponseDto(List<TaskEntity> entityList);
 
-    @Mappings({
+    @Named("getIdFromExecutor")
+    default Long getIdFromExecutor(UserEntity user) {
+        if (user == null) {
+            return null;
+        }
+        return user.getId();
+    }
+
+   /* @Mappings({
             @Mapping(target = "creator", source = "creator", qualifiedByName = "getNewUserWithId"),
             @Mapping(target = "executor", source = "executor", qualifiedByName = "getNewUserWithId"),
             @Mapping(target = "release", source = "release", qualifiedByName = "getNewReleaseWithId")
@@ -29,6 +37,9 @@ public interface TaskMapper {
 
     @Named("getNewUserWithId")
     default UserEntity getNewUserWithId(Long user) {
+        if (user == null) {
+            return null;
+        }
         UserEntity entity = new UserEntity();
         entity.setId(user);
         return entity;
@@ -39,5 +50,7 @@ public interface TaskMapper {
         ReleaseEntity entity = new ReleaseEntity();
         entity.setId(release);
         return entity;
-    }
+    }*/
+
+
 }

@@ -1,5 +1,7 @@
 package com.example.SimbirsoftPractice.entities;
 
+import com.example.SimbirsoftPractice.validators.NotNull;
+
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.Id;
@@ -12,7 +14,7 @@ public class CustomerEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    @NotNull
     private String name;
 
     public CustomerEntity() {
