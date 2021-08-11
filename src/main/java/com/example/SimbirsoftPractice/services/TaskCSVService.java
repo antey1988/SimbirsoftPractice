@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface TaskCSVService {
     String saveFile(MultipartFile file);
-    List<TaskResponseDto> createFromCSV(String filename);
+    String createFromCSV(String filename);
 }

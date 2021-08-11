@@ -10,6 +10,7 @@ import com.example.SimbirsoftPractice.security.UserWithId;
 import com.example.SimbirsoftPractice.services.TaskCSVService;
 import com.example.SimbirsoftPractice.services.TaskValidatorService;
 import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,10 +33,15 @@ import java.util.Objects;
 public class TaskCSVServiceImpl implements TaskCSVService {
 
     private static final String INFO_FILE_SAVED = "Файл %s сохранен в каталоге %s";
+    private static final String WARN_RECORD_NOT_CORRECT = "Строка %d содержит не корректрую информацию: %s";
+    private static final String INFO_RESPONSE = "Количество созданных задач: %d\n" +
+            "Не созданных задач %d:" +
+            "%s";
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
-    private final Path rootDirectory
-            = Paths.get(Objects.requireNonNull(this.getClass().getResource("/")).getPath()).resolve("upload");
+
+    private final Path rootDirectory;
+//            = Paths.get(Objects.requireNonNull(this.getClass().getResource("")).getPath()).resolve("upload");
     private final TaskValidatorService validator;
     private final TaskRepository repository;
     private final TaskMapper mapper;
@@ -44,6 +50,9 @@ public class TaskCSVServiceImpl implements TaskCSVService {
         this.validator = validator;
         this.repository = repository;
         this.mapper = mapper;
+        String resource = Objects.requireNonNull(this.getClass().getResource("/")).getPath();
+        resource = resource.startsWith("/") ? resource.substring(1) : resource;
+        rootDirectory = Paths.get(resource).resolve("upload");
         initDirectory();
     }
 
@@ -70,9 +79,10 @@ public class TaskCSVServiceImpl implements TaskCSVService {
     }
 
     @Override
-    public List<TaskResponseDto> createFromCSV(String filename) {
+    public String createFromCSV(String filename) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Long id = ((IDable)(authentication.getPrincipal())).getId();
+        List<String> badTask = new ArrayList<>();
         List<TaskEntity> newTasks = new ArrayList<>();
         try {
             Reader reader = new FileReader(rootDirectory.resolve(filename).toString());
@@ -81,21 +91,32 @@ public class TaskCSVServiceImpl implements TaskCSVService {
                     .setIgnoreHeaderCase(true)
                     .setSkipHeaderRecord(true)
                     .build();
-            Iterable<CSVRecord> records = csvFormat.parse(reader);
-
-            for (CSVRecord record : records) {
-                TaskRequestDto dto = new TaskRequestDto();
-                dto.setName(record.get("name"));
-                dto.setDescription(record.get("description"));
-                dto.setRelease(Long.parseLong(record.get("release")));
-                dto.setCreator(id);
-                TaskEntity entity = validator.validateInputValue(dto, new TaskEntity());
-                newTasks.add(entity);
+            try (CSVParser records = csvFormat.parse(reader)) {
+                TaskEntity entity;
+                TaskRequestDto dto;
+                for (CSVRecord record : records) {
+                    dto = new TaskRequestDto();
+                    try {
+                        dto.setName(record.get("name"));
+                        dto.setDescription(record.get("description"));
+                        dto.setRelease(Long.parseLong(record.get("release")));
+                        dto.setCreator(id);
+                        entity = validator.validateInputValue(dto, new TaskEntity());
+                    } catch (RuntimeException e) {
+                        String text = String.format(WARN_RECORD_NOT_CORRECT, record.getRecordNumber(), e.getMessage());
+                        logger.warn(text);
+                        badTask.add("\n" + text);
+                        continue;
+                    }
+                    newTasks.add(entity);
+                }
             }
             newTasks = repository.saveAll(newTasks);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
-        return mapper.listEntityToListResponseDto(newTasks);
+        StringBuilder bad = new StringBuilder();
+        badTask.forEach(bad::append);
+        return String.format(INFO_RESPONSE, newTasks.size(), badTask.size(), bad);
     }
 }

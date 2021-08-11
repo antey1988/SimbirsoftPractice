@@ -118,10 +118,10 @@ public class TaskController {
 
     @PostMapping(value = "/tasks/upload")
     @Operation(summary = "Создание новых задач из csv-файла")
-    public ResponseEntity<List<TaskResponseDto>> createTasksFromCSV(@RequestParam(name = "file") MultipartFile file) {
+    public ResponseEntity<String> createTasksFromCSV(@RequestParam(name = "file") MultipartFile file) {
         String filename = csvService.saveFile(file);
-        List<TaskResponseDto> list = csvService.createFromCSV(filename);
-        return ResponseEntity.ok().body(list);
+        String response = csvService.createFromCSV(filename);
+        return ResponseEntity.ok().body(response);
     }
 
     @ExceptionHandler(value = FileNotFoundException.class)
