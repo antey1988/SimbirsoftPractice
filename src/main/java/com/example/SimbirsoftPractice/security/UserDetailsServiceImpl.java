@@ -35,10 +35,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                     logger.warn(text);
                     return new UsernameNotFoundException(text);
                 });
-        return User.builder()
+        UserDetails userDetails = User.builder()
                 .username(user.getName())
                 .password(user.getPassword())
                 .authorities(user.getRolesAsString())
                 .build();
+        return new UserWithId(userDetails, user.getId());
     }
 }
