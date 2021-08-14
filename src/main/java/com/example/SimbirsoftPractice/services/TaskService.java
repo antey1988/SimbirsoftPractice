@@ -15,5 +15,5 @@ public interface TaskService {
     List<TaskResponseDto> readListTasksByReleaseId(Long id, List<StatusTask> statuses);
     List<TaskResponseDto> readListTasksByCreatorId(Long id);
     List<TaskResponseDto> readListTasksByExecutorId(Long id);
-    List<TaskResponseDto> readListAllTasksByFilters(Long rId, Long cId, Long eId, List<StatusTask> statuses);
+    List<TaskResponseDto> readListAllTasksByFilters(String name, String description, Long rId, Long cId, Long eId, List<StatusTask> statuses);
 }

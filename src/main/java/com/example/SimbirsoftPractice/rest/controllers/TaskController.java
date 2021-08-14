@@ -106,12 +106,14 @@ public class TaskController {
 
     @GetMapping(value = "/tasks")
     @Operation(summary = "Список всех задач с возможностью фильтрации")
-    public ResponseEntity<List<TaskResponseDto>> readListTasksByFilters(@RequestParam(name = "release", required = false) Long rId,
+    public ResponseEntity<List<TaskResponseDto>> readListTasksByFilters(@RequestParam(name = "name", required = false) String name,
+                                                                        @RequestParam(name = "description", required = false) String description,
+                                                                        @RequestParam(name = "release", required = false) Long rId,
                                                                         @RequestParam(name = "creator", required = false) Long cId,
                                                                         @RequestParam(name = "executor", required = false) Long eId,
                                                                         @RequestParam(name = "status", required = false) List<StatusTask> statuses) {
         logger.info("Выполнен запрос на получение списка задач с возможностью фильтрации");
-        List<TaskResponseDto> list = service.readListAllTasksByFilters(rId, cId, eId, statuses);
+        List<TaskResponseDto> list = service.readListAllTasksByFilters(name, description, rId, cId, eId, statuses);
         logger.info("Список задач получен");
         return ResponseEntity.ok().body(list);
     }
