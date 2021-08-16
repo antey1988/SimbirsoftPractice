@@ -83,7 +83,7 @@ public class TaskServiceImpl implements TaskService {
 //            statuses = Arrays.asList(StatusTask.BACKLOG, StatusTask.IN_PROGRESS);
 //        }
 //        List<TaskEntity> list = repository.findAllByReleaseId(id,  statuses);
-        Specification<TaskEntity> specification = TaskSpecification.taskReleases(id).and(TaskSpecification.taskStatus(statuses));
+        Specification<TaskEntity> specification = TaskSpecification.createByTaskReleases(id).and(TaskSpecification.createByTaskStatus(statuses));
         List<TaskEntity> list = repository.findAll(specification);
         logger.info(String.format("Список записей со значением поля release_id = %d и " +
                 "status = %s извлечен из базы данных", id, statuses));
@@ -106,12 +106,12 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public List<TaskResponseDto> readListAllTasksByFilters(String name, String description, Long rId, Long cId, Long eId, List<StatusTask> statuses) {
-        Specification<TaskEntity> specification = TaskSpecification.taskName(name)
-                .and(TaskSpecification.taskDescription(description))
-                .and(TaskSpecification.taskReleases(rId))
-                .and(TaskSpecification.taskCreator(cId))
-                .and(TaskSpecification.taskExecutor(eId))
-                .and(TaskSpecification.taskStatus(statuses));
+        Specification<TaskEntity> specification = TaskSpecification.createByTaskName(name)
+                .and(TaskSpecification.createByTaskDescription(description))
+                .and(TaskSpecification.createByTaskReleases(rId))
+                .and(TaskSpecification.createByTaskCreator(cId))
+                .and(TaskSpecification.createByTaskExecutor(eId))
+                .and(TaskSpecification.createByTaskStatus(statuses));
         List<TaskEntity> list =
         repository.findAll(specification);
 //        repository.findAllByFilters(rId, cId, eId, statuses);

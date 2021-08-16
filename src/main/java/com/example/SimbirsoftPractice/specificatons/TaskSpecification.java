@@ -11,67 +11,61 @@ import java.util.List;
 
 public class TaskSpecification {
 
-    public static Specification<TaskEntity> taskName(String name) {
+    public static Specification<TaskEntity> createByTaskName(String name) {
         return (root, criteriaQuery, criteriaBuilder) -> {
             if (name == null) {
                 return criteriaBuilder.isTrue(criteriaBuilder.literal(true));
-            } else {
-                return criteriaBuilder.like(root.get("name"), "%" + name + "%");
             }
+            return criteriaBuilder.like(root.get("name"), "%" + name + "%");
         };
     }
 
-    public static Specification<TaskEntity> taskDescription(String description) {
+    public static Specification<TaskEntity> createByTaskDescription(String description) {
         return (root, criteriaQuery, criteriaBuilder) -> {
             if (description == null) {
                 return criteriaBuilder.isTrue(criteriaBuilder.literal(true));
-            } else {
-                return criteriaBuilder.equal(root.get("description"), "%" + description + "%");
             }
+            return criteriaBuilder.equal(root.get("description"), "%" + description + "%");
         };
     }
 
-    public static Specification<TaskEntity> taskReleases(Long id) {
+    public static Specification<TaskEntity> createByTaskReleases(Long id) {
         return (root, criteriaQuery, criteriaBuilder) -> {
             if (id == null) {
                 return criteriaBuilder.isTrue(criteriaBuilder.literal(true));
-            } else {
-                return criteriaBuilder.equal(root.get("release").get("id"), id);
             }
+            return criteriaBuilder.equal(root.get("release").get("id"), id);
         };
     }
 
-    public static Specification<TaskEntity> taskCreator(Long id) {
+    public static Specification<TaskEntity> createByTaskCreator(Long id) {
         return (root, criteriaQuery, criteriaBuilder) -> {
             if (id == null) {
                 return criteriaBuilder.isTrue(criteriaBuilder.literal(true));
-            } else {
-                return criteriaBuilder.equal(root.get("creator").get("id"), id);
             }
+            return criteriaBuilder.equal(root.get("creator").get("id"), id);
         };
     }
 
-    public static Specification<TaskEntity> taskExecutor(Long id) {
+    public static Specification<TaskEntity> createByTaskExecutor(Long id) {
         return (root, criteriaQuery, criteriaBuilder) -> {
             if (id == null) {
                 return criteriaBuilder.isTrue(criteriaBuilder.literal(true));
-            } else {
-                return criteriaBuilder.equal(root.get("executor").get("id"), id);
             }
+            return criteriaBuilder.equal(root.get("executor").get("id"), id);
         };
     }
 
-    public static Specification<TaskEntity> taskStatus(List<StatusTask> statuses) {
+    public static Specification<TaskEntity> createByTaskStatus(List<StatusTask> statuses) {
         return (root, criteriaQuery, criteriaBuilder) -> {
             if (statuses == null || statuses.isEmpty()) {
                 return criteriaBuilder.isTrue(criteriaBuilder.literal(true));
-            } else {
-                return criteriaBuilder.in(root.get("status")).value(statuses);
             }
+            return criteriaBuilder.in(root.get("status")).value(statuses);
         };
     }
 
-    public static Specification<TaskEntity> tasksByProject(Long id, StatusTask status) {
+    public static Specification<TaskEntity> createByTasksByProject(Long id, StatusTask status) {
         return (root, criteriaQuery, criteriaBuilder) -> {
             Join<TaskEntity, ReleaseEntity> releaseEntityJoin = root.join("release");
             Join<ReleaseEntity, ProjectEntity> projectEntityJoin = releaseEntityJoin.join("project");
