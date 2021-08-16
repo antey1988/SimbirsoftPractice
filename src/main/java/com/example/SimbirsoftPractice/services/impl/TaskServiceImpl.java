@@ -9,13 +9,14 @@ import com.example.SimbirsoftPractice.rest.dto.TaskRequestDto;
 import com.example.SimbirsoftPractice.rest.dto.TaskResponseDto;
 import com.example.SimbirsoftPractice.services.TaskService;
 import com.example.SimbirsoftPractice.services.TaskValidatorService;
+import com.example.SimbirsoftPractice.specificatons.TaskSpecification;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
-import java.util.Arrays;
 import java.util.Optional;
 
 @Service
@@ -78,10 +79,12 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public List<TaskResponseDto> readListTasksByReleaseId(Long id, List<StatusTask> statuses) {
-        if (statuses == null || statuses.isEmpty()){
-            statuses = Arrays.asList(StatusTask.BACKLOG, StatusTask.IN_PROGRESS);
-        }
-        List<TaskEntity> list = repository.findAllByReleaseId(id,  statuses);
+//        if (statuses == null || statuses.isEmpty()){
+//            statuses = Arrays.asList(StatusTask.BACKLOG, StatusTask.IN_PROGRESS);
+//        }
+//        List<TaskEntity> list = repository.findAllByReleaseId(id,  statuses);
+        Specification<TaskEntity> specification = TaskSpecification.createByTaskReleases(id).and(TaskSpecification.createByTaskStatus(statuses));
+        List<TaskEntity> list = repository.findAll(specification);
         logger.info(String.format("Список записей со значением поля release_id = %d и " +
                 "status = %s извлечен из базы данных", id, statuses));
         return mapper.listEntityToListResponseDto(list);
@@ -102,10 +105,18 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public List<TaskResponseDto> readListAllTasksByFilters(Long rId, Long cId, Long eId, List<StatusTask> statuses) {
-        List<TaskEntity> list = repository.findAllByFilters(rId, cId, eId, statuses);
-        logger.info(String.format("Список записей со значением поля release_id = %d, creator_id =  %d, " +
-                "executor_id = %d и status = %s извлечен из базы данных", rId, cId, eId, statuses));
+    public List<TaskResponseDto> readListAllTasksByFilters(String name, String description, Long rId, Long cId, Long eId, List<StatusTask> statuses) {
+        Specification<TaskEntity> specification = TaskSpecification.createByTaskName(name)
+                .and(TaskSpecification.createByTaskDescription(description))
+                .and(TaskSpecification.createByTaskReleases(rId))
+                .and(TaskSpecification.createByTaskCreator(cId))
+                .and(TaskSpecification.createByTaskExecutor(eId))
+                .and(TaskSpecification.createByTaskStatus(statuses));
+        List<TaskEntity> list =
+        repository.findAll(specification);
+//        repository.findAllByFilters(rId, cId, eId, statuses);
+        logger.info(String.format("Список записей со значением поля name = %s, description = %s, release_id = %d, creator_id =  %d, " +
+                "executor_id = %d и status = %s извлечен из базы данных", name, description, rId, cId, eId, statuses));
         return mapper.listEntityToListResponseDto(list);
     }
 }

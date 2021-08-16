@@ -10,6 +10,7 @@ import com.example.SimbirsoftPractice.services.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -23,11 +24,13 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository repository;
     private final UserMapper mapper;
+    private final PasswordEncoder encoder;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper) {
+    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, PasswordEncoder encoder) {
         this.repository = userRepository;
         this.mapper = userMapper;
+        this.encoder = encoder;
     }
 
     @Override
@@ -38,6 +41,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponseDto createUser(UserRequestDto userRequestDto) {
+        userRequestDto.setPassword(encoder.encode(userRequestDto.getPassword()));
         UserEntity userEntity = mapper.requestDtoToEntity(userRequestDto, new UserEntity());
         userEntity = repository.save(userEntity);
         logger.info("Новая запись добавлена в базу данных");

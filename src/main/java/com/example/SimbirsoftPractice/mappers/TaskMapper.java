@@ -1,9 +1,7 @@
 package com.example.SimbirsoftPractice.mappers;
 
-import com.example.SimbirsoftPractice.entities.ReleaseEntity;
 import com.example.SimbirsoftPractice.entities.TaskEntity;
 import com.example.SimbirsoftPractice.entities.UserEntity;
-import com.example.SimbirsoftPractice.rest.dto.TaskRequestDto;
 import com.example.SimbirsoftPractice.rest.dto.TaskResponseDto;
 import org.mapstruct.*;
 

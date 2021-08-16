@@ -3,6 +3,7 @@ package com.example.SimbirsoftPractice.rest.controllers;
 import com.example.SimbirsoftPractice.rest.domain.StatusTask;
 import com.example.SimbirsoftPractice.rest.dto.TaskRequestDto;
 import com.example.SimbirsoftPractice.rest.dto.TaskResponseDto;
+import com.example.SimbirsoftPractice.services.TaskCSVService;
 import com.example.SimbirsoftPractice.services.TaskService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileNotFoundException;
 import java.util.List;
@@ -30,9 +32,11 @@ public class TaskController {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final TaskService service;
+    private final TaskCSVService csvService;
 
-    public TaskController(TaskService service) {
+    public TaskController(TaskService service, TaskCSVService csvService) {
         this.service = service;
+        this.csvService = csvService;
     }
 
     @PostMapping(value = "/tasks")
@@ -92,7 +96,7 @@ public class TaskController {
     }
 
     @GetMapping(value = "/user/{id}/tasks/execution")
-    @Operation(summary = "Список всех задач, испольнителем которых является указанный пользователь")
+    @Operation(summary = "Список всех задач, исполнителем которых является указанный пользователь")
     public ResponseEntity<List<TaskResponseDto>> readListTasksOfExecutorUser(@PathVariable Long id) {
         logger.info("Выполнен запрос на получение списка задач, выполненных или выполняемых указанным пользователем");
         List<TaskResponseDto> list = service.readListTasksByExecutorId(id);
@@ -102,14 +106,24 @@ public class TaskController {
 
     @GetMapping(value = "/tasks")
     @Operation(summary = "Список всех задач с возможностью фильтрации")
-    public ResponseEntity<List<TaskResponseDto>> readListTasksByFilters(@RequestParam(name = "release", required = false) Long rId,
+    public ResponseEntity<List<TaskResponseDto>> readListTasksByFilters(@RequestParam(name = "name", required = false) String name,
+                                                                        @RequestParam(name = "description", required = false) String description,
+                                                                        @RequestParam(name = "release", required = false) Long rId,
                                                                         @RequestParam(name = "creator", required = false) Long cId,
                                                                         @RequestParam(name = "executor", required = false) Long eId,
                                                                         @RequestParam(name = "status", required = false) List<StatusTask> statuses) {
         logger.info("Выполнен запрос на получение списка задач с возможностью фильтрации");
-        List<TaskResponseDto> list = service.readListAllTasksByFilters(rId, cId, eId, statuses);
+        List<TaskResponseDto> list = service.readListAllTasksByFilters(name, description, rId, cId, eId, statuses);
         logger.info("Список задач получен");
         return ResponseEntity.ok().body(list);
+    }
+
+    @PostMapping(value = "/tasks/upload")
+    @Operation(summary = "Создание новых задач из csv-файла")
+    public ResponseEntity<String> createTasksFromCSV(@RequestParam(name = "file") MultipartFile file) {
+        String filename = csvService.saveFile(file);
+        String response = csvService.createFromCSV(filename);
+        return ResponseEntity.ok().body(response);
     }
 
     @ExceptionHandler(value = FileNotFoundException.class)

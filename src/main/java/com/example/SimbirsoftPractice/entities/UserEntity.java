@@ -13,6 +13,7 @@ import javax.persistence.EnumType;
 import javax.persistence.ElementCollection;
 import javax.persistence.CollectionTable;
 import javax.persistence.JoinColumn;
+import javax.persistence.FetchType;
 import java.util.Set;
 
 @Entity
@@ -25,7 +26,10 @@ public class UserEntity {
     @Column(nullable = false)
     private String name;
 
-    @ElementCollection()
+    @Column(nullable = false)
+    private String password;
+
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "roles", joinColumns = @JoinColumn(name = "user_id"))
     @Column(name = "role")
     @Enumerated(EnumType.STRING)
@@ -47,8 +51,20 @@ public class UserEntity {
         this.name = name;
     }
 
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     public Set<Role> getRoles() {
         return roles;
+    }
+
+    public String[] getRolesAsString() {
+        return roles.stream().map(Role::name).toArray(String[]::new);
     }
 
     public void setRoles(Set<Role> roles) {

@@ -57,7 +57,7 @@ public class TaskValidatorServiceImpl implements TaskValidatorService {
         String oValue = oldValue.getName();
         String nValue = newValue.getName();
         //при создании записи поле должно быть заполнено
-        if (nValue == null && oValue == null) {
+        if ((nValue == null || nValue.equals("")) && oValue == null) {
             String text = String.format(WARN_NULL_VALUE_FIELD, FIELD_NAME);
             logger.warn(text);
             throw new NullValueFieldException(text);
@@ -153,6 +153,7 @@ public class TaskValidatorServiceImpl implements TaskValidatorService {
             throw new IllegalStatusException(text);
         }
         oldValue.setStatus(nValue);
+        newValue.setStatus(nValue);
         logger.info(String.format(INFO_GOOD_CHECKED_FIELD, FIELD_STATUS));
     }
 
