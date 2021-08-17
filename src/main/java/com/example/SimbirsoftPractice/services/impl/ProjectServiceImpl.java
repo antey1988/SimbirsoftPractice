@@ -1,15 +1,21 @@
 package com.example.SimbirsoftPractice.services.impl;
 
 import com.example.SimbirsoftPractice.entities.ProjectEntity;
+import com.example.SimbirsoftPractice.feign.NotAvailablePaymentServiceException;
+import com.example.SimbirsoftPractice.feign.PaymentClient;
 import com.example.SimbirsoftPractice.mappers.ProjectMapper;
 import com.example.SimbirsoftPractice.repos.ProjectRepository;
 import com.example.SimbirsoftPractice.rest.controllers.exceptions.NotFoundException;
+import com.example.SimbirsoftPractice.rest.domain.StatusProject;
+import com.example.SimbirsoftPractice.rest.dto.PaymentProjectRequestDto;
 import com.example.SimbirsoftPractice.rest.dto.ProjectRequestDto;
 import com.example.SimbirsoftPractice.rest.dto.ProjectResponseDto;
 import com.example.SimbirsoftPractice.services.ProjectService;
 import com.example.SimbirsoftPractice.services.ProjectValidatorService;
+import feign.RetryableException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -25,11 +31,13 @@ public class ProjectServiceImpl implements ProjectService {
     private final ProjectMapper mapper;
     private final ProjectRepository repository;
     private final ProjectValidatorService validator;
+    private final PaymentClient paymentClient;
 
-    public ProjectServiceImpl(ProjectMapper mapper, ProjectRepository repository, ProjectValidatorService validator) {
+    public ProjectServiceImpl(ProjectMapper mapper, ProjectRepository repository, ProjectValidatorService validator, PaymentClient paymentClient) {
         this.mapper = mapper;
         this.repository = repository;
         this.validator = validator;
+        this.paymentClient = paymentClient;
     }
 
     @Override
@@ -51,7 +59,12 @@ public class ProjectServiceImpl implements ProjectService {
     public ProjectResponseDto updateProject(ProjectRequestDto projectRequestDto, Long id) {
         ProjectEntity projectEntity = getOrElseThrow(id);
         projectEntity =  validator.validateInputValue(projectRequestDto, projectEntity);
-        return mapper.entityToResponseDto(projectEntity);
+        ProjectResponseDto response = mapper.entityToResponseDto(projectEntity);
+        if (projectEntity.getStatus() == StatusProject.OPEN) {
+            createOperationInPaymentService(projectEntity);
+        }
+        logger.info("Запись обновлена в базе данных");
+        return response;
     }
 
     @Override
@@ -85,8 +98,19 @@ public class ProjectServiceImpl implements ProjectService {
         return entity;
     }
 
-//    @Override
-//    public ProjectEntity readProjectByTaskId(Long id) {
-//        return repository.getProjectByTask(id);
-//    }
+    //обращение к платежному сервису для списание денежных средств за работу по проекту
+    private void createOperationInPaymentService(ProjectEntity project) {
+        PaymentProjectRequestDto payment = mapper.entityToPaymentProjectRequestDto(project);
+        try {
+            ResponseEntity<String> response = paymentClient.payProject(payment);
+            logger.info(response.getBody());
+        } catch (RetryableException e) {
+            String text = "Платежный сервис не доступен";
+            logger.warn(text);
+            logger.warn(e.getMessage());
+            throw new NotAvailablePaymentServiceException(text);
+        } catch (Exception e) {
+            e.getMessage();
+        }
+    }
 }

@@ -12,6 +12,7 @@ import javax.persistence.FetchType;
 import javax.persistence.Column;
 import javax.persistence.Enumerated;
 import javax.persistence.EnumType;
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Entity
@@ -26,7 +27,7 @@ public class ProjectEntity {
 
     private String description;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(optional = false)
     private CustomerEntity customer;
 
     @Column(name = "startDate")
@@ -38,6 +39,8 @@ public class ProjectEntity {
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
     private StatusProject status;
+
+    private BigDecimal price;
 
     public ProjectEntity() {
     }
@@ -96,5 +99,13 @@ public class ProjectEntity {
 
     public void setStatus(StatusProject status) {
         this.status = status;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
     }
 }

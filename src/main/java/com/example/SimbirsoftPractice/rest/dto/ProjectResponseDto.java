@@ -3,6 +3,7 @@ package com.example.SimbirsoftPractice.rest.dto;
 import com.example.SimbirsoftPractice.rest.domain.StatusProject;
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Schema(description = "Данные о проекте (from back to front)")
@@ -21,6 +22,8 @@ public class ProjectResponseDto {
     private Date stopDate;
     @Schema(description = "Статус проекта")
     private StatusProject status;
+    @Schema(description = "Стоимость проекта")
+    private BigDecimal price;
 
     public Long getId() {
         return id;
@@ -76,5 +79,13 @@ public class ProjectResponseDto {
 
     public void setStatus(StatusProject status) {
         this.status = status;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
     }
 }

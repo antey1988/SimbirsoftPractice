@@ -1,5 +1,6 @@
 package com.example.SimbirsoftPractice.rest.controllers;
 
+import com.example.SimbirsoftPractice.feign.NotAvailablePaymentServiceException;
 import com.example.SimbirsoftPractice.rest.controllers.exceptions.NotFoundException;
 import com.example.SimbirsoftPractice.rest.controllers.exceptions.TestRuntimeException;
 import com.example.SimbirsoftPractice.rest.domain.exceptions.IllegalStatusException;
@@ -14,18 +15,23 @@ import java.io.IOException;
 
 @RestControllerAdvice
 public class ErrorController {
-    @ExceptionHandler({IOException.class, TestRuntimeException.class})
-    public ResponseEntity handlerException(Exception e) {
-        return new ResponseEntity(e.toString(), HttpStatus.BAD_REQUEST);
-    }
+//    @ExceptionHandler({IOException.class, TestRuntimeException.class})
+//    public ResponseEntity<String> handlerException(Exception e) {
+//        return new ResponseEntity(e.toString(), HttpStatus.BAD_REQUEST);
+//    }
 
     @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity handlerNotFoundException(RuntimeException e) {
-        return new ResponseEntity(e.getMessage(), HttpStatus.NOT_FOUND);
+    public ResponseEntity<String> handleNotFoundException(RuntimeException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
     }
 
     @ExceptionHandler({IllegalStatusException.class, NullValueFieldException.class, NullValueObjectException.class})
-    public ResponseEntity handlerIllegalStateStatusException(RuntimeException e) {
-        return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
+    public ResponseEntity<String> handleIllegalStateStatusException(RuntimeException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+    }
+
+    @ExceptionHandler(NotAvailablePaymentServiceException.class)
+    public ResponseEntity<String> handleNotСreatedClientException(NotAvailablePaymentServiceException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
     }
 }

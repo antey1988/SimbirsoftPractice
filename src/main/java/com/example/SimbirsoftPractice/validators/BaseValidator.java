@@ -7,10 +7,7 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Map;
-import java.util.Set;
-import java.util.HashSet;
-import java.util.Arrays;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public abstract class BaseValidator<DTO, ENTITY> {
@@ -31,20 +28,22 @@ public abstract class BaseValidator<DTO, ENTITY> {
         Map<String, Field> fieldsEntity = Arrays.stream(entity.getDeclaredFields())
                 .filter(f->!f.getName().equals("id")).collect(Collectors.toMap(Field::getName, f->f));
         Map<String, Field> fieldsDto = Arrays.stream(dto.getDeclaredFields())
-                .collect(Collectors.toMap(Field::getName, f->f));   
+                .collect(Collectors.toMap(Field::getName, f->f));
+        List<String> badField = new ArrayList<>();
         //для каждого поля из класса сущности ищем соответствующее поле в классе дто,
-        //если не найдено бросаем исключение
+        //если не найдено добавляем в список "плохих" полей
         for (Map.Entry<String, Field> field : fieldsEntity.entrySet()) {
+            if (field.getValue().isAnnotationPresent(ValidIgnore.class)) {
+                continue;
+            }
             String fieldName = field.getKey();
             if (!fieldsDto.containsKey(fieldName)) {
-                String text = String.format("Для целевого поля %s из класса %s не найдено соответствующее поле c таким же именем в классе %s",
-                        fieldName, entity, dto);
-                        logger.error(text);
-                throw new NoSuchFieldException(text);
+                badField.add(fieldName);
+                continue;
             }
             //добавляем класс с методом проверки по умолчанию,
             //передавая в параметрах поля-источник и поле-цель
-            if (field.getValue().isAnnotationPresent(NotNull.class)) {
+            if (field.getValue().isAnnotationPresent(ValidNotNull.class)) {
                 methodsOnCreation.add(new MethodValidation(fieldName, defaultMethodNotNullField, fieldsDto.get(fieldName), field.getValue()));
             } else {
                 methodsOnCreation.add(new MethodValidation(fieldName, defaultMethodMayBeNullField, fieldsDto.get(fieldName), field.getValue()));
@@ -53,13 +52,15 @@ public abstract class BaseValidator<DTO, ENTITY> {
         }
         //поиск методов, в которых самостоятельно описана проверка полей
         for (Method method : this.getClass().getMethods()) {
-            if (method.isAnnotationPresent(Valid.class)) {
-                Valid valid = method.getAnnotation(Valid.class);
+            if (method.isAnnotationPresent(Validing.class)) {
+                Validing valid = method.getAnnotation(Validing.class);
                 String fieldName = valid.field();
                 if (!fieldsEntity.containsKey(valid.field())) {
                     logger.warn(String.format("В классе %s нет поля с наименованием %s", entity, fieldName));
                     continue;
                 }
+                //удаляем из списка "плохих" полей
+                badField.remove(fieldName);
                 TypeValid typeValid = valid.type();
                 MethodValidation fieldValidator = new MethodValidation(fieldName, method);
                 if (typeValid == TypeValid.BOTH) {                    
@@ -72,12 +73,31 @@ public abstract class BaseValidator<DTO, ENTITY> {
                 }
             }
         }
+        if (!badField.isEmpty()) {
+            String text = String.format("Для ниже указанных полей из класса %s " +
+                    "не найдены соответствующие поля c таким же именем в классе %s, " +
+                    "либо не реализованы собственные методы проверок заполнения \n %s", entity, dto, badField);
+            logger.error(text);
+            throw new NoSuchFieldException(text);
+        }
 
     }
 
     public ENTITY validateOnCreation(DTO dto, ENTITY entity) {
         System.out.println("");
         methodsOnCreation.forEach(m-> {
+            try {
+                m.invoke(dto, entity);
+            } catch (InvocationTargetException | IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        });
+        return entity;
+    }
+
+    public ENTITY validateOnUpdate(DTO dto, ENTITY entity) {
+        System.out.println("");
+        methodsOnUpdate.forEach(m-> {
             try {
                 m.invoke(dto, entity);
             } catch (InvocationTargetException | IllegalAccessException e) {
@@ -136,7 +156,7 @@ public abstract class BaseValidator<DTO, ENTITY> {
         private MethodValidation(String fieldName, Method methodValidation, Object ... args) {
             this.fieldName = fieldName;
             this.methodValidation = methodValidation;
-            this.args = args == null ? new Object[2] : new Object[]{null, null, args[0], args[1]};
+            this.args = (args == null) || (args.length == 0) ? new Object[2] : new Object[]{null, null, args[0], args[1]};
         }
 
         private void invoke(DTO source, ENTITY target) throws InvocationTargetException, IllegalAccessException {

@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Service
@@ -29,6 +30,7 @@ public class ProjectValidatorServiceImpl implements ProjectValidatorService {
     private static final String FIELD_START_DATE = "ДАТА ОТКРЫТИЯ";
     private static final String FIELD_STOP_DATE = "ДАТА ЗАКРЫТИЯ";
     private static final String FIELD_CUSTOMER = "КЛИЕНТ";
+    private static final String FIELD_PRICE = "СТОИМОСТЬ";
     private static final StatusProject STATUS_DEFAULT = StatusProject.CREATED;
     private static final StatusProject STATUS_TO_SET_START_DATA = StatusProject.OPEN;
     private static final StatusProject STATUS_TO_SET_STOP_DATA = StatusProject.CLOSED;
@@ -50,6 +52,7 @@ public class ProjectValidatorServiceImpl implements ProjectValidatorService {
         validateStatus(newValue, oldValue);
         validateStartDate(newValue, oldValue);
         validateStopDate(newValue, oldValue);
+        validatePrice(newValue, oldValue);
         return oldValue;
         //other validation
     }
@@ -127,8 +130,6 @@ public class ProjectValidatorServiceImpl implements ProjectValidatorService {
             //дополнительная проверка, если статус требует этого
             if (nValue == StatusProject.CLOSED) {
                 validateNotDoneTasks(oldValue.getId());
-            } else if (nValue == StatusProject.OPEN) {
-                validateNotDoneTasks(oldValue.getCustomer().getId());
             }
             oldValue.setStatus(nValue);
             logger.info(String.format(INFO_GOOD_CHECKED_FIELD, FIELD_STATUS));
@@ -171,15 +172,27 @@ public class ProjectValidatorServiceImpl implements ProjectValidatorService {
         }
     }
 
+    private void validatePrice(ProjectRequestDto newValue, ProjectEntity oldValue) {
+        logger.debug(String.format(INFO_START_CHECK_FIELD, FIELD_PRICE));
+        BigDecimal oValue = oldValue.getPrice();
+        BigDecimal nValue = newValue.getPrice();
+        //при создании записи присваиваем нулевую стоимость
+        if (nValue == null && oValue == null) {
+            oldValue.setPrice(new BigDecimal("0.00"));
+        }
+        //при обновлении записи поле измениться на новое значение,
+        //если оно отличается от старого
+        if (nValue != null && !nValue.equals(oValue)) {
+            oldValue.setPrice(nValue);
+            logger.info(String.format(INFO_GOOD_CHECKED_FIELD, FIELD_PRICE));
+        }
+    }
+
     private void validateNotDoneTasks(Long projectId) {
         Long count = taskRepository.countTasksInProcessByProjectId(projectId, StatusTask.DONE);
         if (count != 0) {
             logger.warn(WARN_CLOSE_PROJECT);
             throw new IllegalStatusException(WARN_CLOSE_PROJECT);
         }
-    }
-
-    private void validateBankAccountCustomer(Long customerId) {
-
     }
 }

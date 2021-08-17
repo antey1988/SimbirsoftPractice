@@ -1,0 +1,11 @@
+databaseChangeLog:
+  #Создание столбца price в таблице projects
+  - changeSet:
+      id: 000000-add-column-price-to-projects
+      author: ${author}
+      changes:
+        - addColumn:
+            tableName: projects
+            columns:
+              - column: {name: price, type: decimal}
+

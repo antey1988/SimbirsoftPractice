@@ -1,0 +1,16 @@
+databaseChangeLog:
+  #Создание столбца uuid в таблице customers
+  - changeSet:
+      id: 000000-add-column-uuid-to-customers
+      author: ${author}
+      changes:
+        - addColumn:
+            tableName: customers
+            columns:
+              - column:
+                  name: uuid
+                  type: uuid
+                  constraints:
+                    nullable: false
+                    unique: true
+
