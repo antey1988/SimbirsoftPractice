@@ -16,7 +16,8 @@ import java.util.List;
 @RequestMapping("/api/projects")
 @Tag(name = "Проекты", description = "Создание, изменение, удаление, просмотр списка проектов")
 public class ProjectController {
-
+    private static final String REQUEST = "Request: %s " +
+            "http://localhost:8080/api/pojects" + "%s";
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final ProjectService service;
 
@@ -27,18 +28,16 @@ public class ProjectController {
     @PostMapping
     @Operation(summary = "Создание нового проекта")
     public ResponseEntity<ProjectResponseDto> createProject(@RequestBody ProjectRequestDto requestDto) {
-        logger.info("Выполнен запрос на создание нового клиента");
+        logger.info(String.format(REQUEST, "POST", ""));
         ProjectResponseDto projectResponseDto = service.createProject(requestDto);
-        logger.info("Новый клиент создан");
         return ResponseEntity.ok().body(projectResponseDto);
     }
 
     @GetMapping(value = "/{id}")
     @Operation(summary = "Просмотр информации о проекте")
     public ResponseEntity<ProjectResponseDto> getProject(@PathVariable Long id) {
-        logger.info(String.format("Выполнен запрос на получение информации о проекте c id = %d", id));
+        logger.info(String.format(REQUEST, "GET", "/" + id));
         ProjectResponseDto projectResponseDto = service.readProject(id);
-        logger.info(String.format("Информация о проекте c id = %d поучена", id));
         return ResponseEntity.ok().body(projectResponseDto);
     }
 
@@ -46,27 +45,24 @@ public class ProjectController {
     @Operation(summary = "Изменение информации о проекте")
     public ResponseEntity<ProjectResponseDto> updateProject(@RequestBody ProjectRequestDto requestDto,
                                                       @PathVariable Long id) {
-        logger.info(String.format("Выполнен запрос на изменение информации о проекте c id = %d", id));
+        logger.info(String.format(REQUEST, "PUT", "/" + id));
         ProjectResponseDto projectResponseDto = service.updateProject(requestDto, id);
-        logger.info(String.format("Информация о проекте c id = %d успешно обновлена", id));
         return ResponseEntity.ok().body(projectResponseDto);
     }
 
     @DeleteMapping(value = "/{id}")
     @Operation(summary = "Удаление проекта")
     public ResponseEntity<?> deleteProject(@PathVariable Long id) {
-        logger.info(String.format("Выполнен запрос на удаление проекта c id = %d", id));
+        logger.info(String.format(REQUEST, "DELETE", "/" + id));
         service.deleteProject(id);
-        logger.info(String.format("Проект c id = %d успешно удален", id));
         return ResponseEntity.accepted().build();
     }
 
     @GetMapping
     @Operation(summary = "Просмотр списка проектов")
     public ResponseEntity<List<ProjectResponseDto>> readListProjects(@RequestParam(required = false) Long id) {
-        logger.info("Выполнен запрос на получение списка проектов");
+        logger.info(String.format(REQUEST, "GET", ""));
         List<ProjectResponseDto> list = service.readListProjects(id);
-        logger.info("Список проектов получен");
         return ResponseEntity.ok().body(list);
     }
 

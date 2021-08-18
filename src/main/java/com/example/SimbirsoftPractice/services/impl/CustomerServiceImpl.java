@@ -11,10 +11,12 @@ import com.example.SimbirsoftPractice.services.CustomerValidatorService;
 import com.example.SimbirsoftPractice.services.PaymentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 @Service
@@ -25,18 +27,20 @@ public class CustomerServiceImpl implements CustomerService {
     private final CustomerMapper mapper;
     private final CustomerValidatorService validator;
     private final PaymentService paymentService;
+    private final MessageSource messageSource;
 
     public CustomerServiceImpl(CustomerRepository customerRepository, CustomerMapper customerMapper,
-                               CustomerValidatorService validator, PaymentService paymentService) {
+                               CustomerValidatorService validator, PaymentService paymentService, MessageSource messageSource) {
         this.repository = customerRepository;
         this.mapper = customerMapper;
         this.validator = validator;
         this.paymentService = paymentService;
+        this.messageSource = messageSource;
     }
 
     @Override
-    public CustomerResponseDto readCustomer(Long id) {
-        CustomerEntity customerEntity = getOrElseThrow(id);
+    public CustomerResponseDto readCustomer(Long id, Locale locale) {
+        CustomerEntity customerEntity = getOrElseThrow(id, locale);
         return mapper.entityToResponseDto(customerEntity);
     }
 
@@ -47,41 +51,39 @@ public class CustomerServiceImpl implements CustomerService {
         customerEntity = repository.save(customerEntity);
         CustomerResponseDto response = mapper.entityToResponseDto(customerEntity);
         paymentService.createClient(mapper.entityToResponseDtoWithUUID(customerEntity));
-        logger.info("Новая запись добавлена в базу данных");
+        logger.info("New record added to DB");
         return response;
     }
 
     @Override
     @Transactional
-    public CustomerResponseDto updateCustomer(CustomerRequestDto customerRequestDto, Long id) {
-        CustomerEntity customerEntity = getOrElseThrow(id);
+    public CustomerResponseDto updateCustomer(CustomerRequestDto customerRequestDto, Long id, Locale locale) {
+        CustomerEntity customerEntity = getOrElseThrow(id, locale);
         customerEntity = validator.validateOnUpdate(customerRequestDto, customerEntity);
-        logger.info("Запись обновлена в базе данных");
+        logger.info("Record updated in the DB");
         return mapper.entityToResponseDto(customerEntity);
     }
 
     @Override
-    public void deleteCustomer(Long id) {
-        CustomerEntity customerEntity = getOrElseThrow(id);
+    public void deleteCustomer(Long id, Locale locale) {
+        CustomerEntity customerEntity = getOrElseThrow(id, locale);
         repository.deleteById(id);
-        logger.info("Запись удалена из базы данных");
+        logger.info("Record deleted from database");
     }
 
     @Override
     public List<CustomerResponseDto> getListCustomers() {
         List<CustomerEntity> list = repository.findAll();
-        logger.info("Список записей извлечен из базы данных");
+        logger.info("All records retrieved from the DB");
         return mapper.listEntityToListResponseDto(list);
     }
 
-    private CustomerEntity getOrElseThrow(Long id ) {
-        logger.info(String.format("Попытка извлечения записи c id = %d из базы данных", id));
+    private CustomerEntity getOrElseThrow(Long id, Locale locale ) {
+        logger.info(String.format("Extracting record with identifier(id) = %d from DB", id));
         Optional<CustomerEntity> optionalCustomer = repository.findById(id);
-        CustomerEntity entity = optionalCustomer.orElseThrow(() -> {
-            logger.warn(String.format("Запись c id = %d отсутсвует в базе данных", id));
-            return new NotFoundException(String.format("Клиента с id = %d не существует", id));
+        return optionalCustomer.orElseThrow(() -> {
+            logger.warn(String.format("Record with identifier (id) =% d does not exist", id));
+            return new NotFoundException(String.format(messageSource.getMessage("error.NotFound", null, locale), id));
         });
-        logger.info(String.format("Запись c id = %d успешно извлечена из базы данных", id));
-        return entity;
     }
 }

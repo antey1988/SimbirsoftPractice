@@ -29,7 +29,8 @@ import java.util.List;
 @RequestMapping("/api")
 @Tag(name = "Задачи", description = "Создание, изменение, удаление, просмотр списка задач")
 public class TaskController {
-
+    private static final String REQUEST = "Request: %s " +
+            "http://localhost:8080/api" + "%s";
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final TaskService service;
     private final TaskCSVService csvService;
@@ -42,16 +43,15 @@ public class TaskController {
     @PostMapping(value = "/tasks")
     @Operation(summary = "Создание новой задачи")
     public ResponseEntity<TaskResponseDto> createTask(@RequestBody TaskRequestDto requestDto) {
-        logger.info("Выполнен запрос на создание новой задачи");
+        logger.info(String.format(REQUEST, "POST", "/tasks"));
         TaskResponseDto responseDto = service.createTask(requestDto);
-        logger.info("Новая задача создана");
         return ResponseEntity.ok().body(responseDto);
     }
 
     @GetMapping(value = "/tasks/{id}")
     @Operation(summary = "Просмотр состояния задачи")
     public ResponseEntity<TaskResponseDto> readTask(@PathVariable Long id) {
-        logger.info(String.format("Выполнен запрос на получение информации о задаче c id = %d", id));
+        logger.info(String.format(REQUEST, "GET", "/tasks/" + id));
         TaskResponseDto responseDto = service.readTask(id);
         logger.info(String.format("Информация о задаче с id = %d получена", id));
         return ResponseEntity.ok().body(responseDto);
@@ -61,18 +61,16 @@ public class TaskController {
     @Operation(summary = "Изменение состояния задачи")
     public ResponseEntity<TaskResponseDto> updateTask(@RequestBody TaskRequestDto requestDto,
                                                          @PathVariable Long id) {
-        logger.info(String.format("Выполнен запрос на изменение информации о задаче c id = %d", id));
+        logger.info(String.format(REQUEST, "PUT", "/tasks/" + id));
         TaskResponseDto responseDto = service.updateTask(requestDto, id);
-        logger.info(String.format("Информация о задаче c id = %d успешно обновлена", id));
         return ResponseEntity.ok().body(responseDto);
     }
 
     @DeleteMapping(value = "/tasks/{id}")
     @Operation(summary = "Удаление задачи")
     public ResponseEntity<?> deleteTask(@PathVariable Long id) {
-        logger.info(String.format("Выполнен запрос на удаление задачи c id = %d", id));
+        logger.info(String.format(REQUEST, "DELETE", "/tasks/" + id));
         service.deleteTask(id);
-        logger.info(String.format("Задача c id = %d успешно удален", id));
         return ResponseEntity.accepted().build();
     }
 
@@ -80,27 +78,24 @@ public class TaskController {
     @Operation(summary = "Список задач с возможностью фильтрации по статусу, созданных в рамках одного релиза")
     public ResponseEntity<List<TaskResponseDto>> readListTasksOfRelease(@PathVariable Long id,
                                                                         @RequestParam(name = "status", required = false) List<StatusTask> statuses) {
-        logger.info("Выполнен запрос на получение списка задач в рамках указанного релиза и указанных статусов");
+        logger.info(String.format(REQUEST, "GET", "/releases/" + id + "/tasks"));
         List<TaskResponseDto> list = service.readListTasksByReleaseId(id, statuses);
-        logger.info("Список задач получен");
         return ResponseEntity.ok().body(list);
     }
 
     @GetMapping(value = "/user/{id}/tasks/creation")
     @Operation(summary = "Список всех задач, созданных одним пользователем")
     public ResponseEntity<List<TaskResponseDto>> readListTasksOfCreatorUser(@PathVariable Long id) {
-        logger.info("Выполнен запрос на получение списка задач, созданных указанным пользователем");
+        logger.info(String.format(REQUEST, "GET", "/user/" + id + "/tasks/creation"));
         List<TaskResponseDto> list = service.readListTasksByCreatorId(id);
-        logger.info("Список задач получен");
         return ResponseEntity.ok().body(list);
     }
 
     @GetMapping(value = "/user/{id}/tasks/execution")
     @Operation(summary = "Список всех задач, исполнителем которых является указанный пользователь")
     public ResponseEntity<List<TaskResponseDto>> readListTasksOfExecutorUser(@PathVariable Long id) {
-        logger.info("Выполнен запрос на получение списка задач, выполненных или выполняемых указанным пользователем");
+        logger.info(String.format(REQUEST, "GET", "/user/" + id + "/tasks/execution"));
         List<TaskResponseDto> list = service.readListTasksByExecutorId(id);
-        logger.info("Список задач получен");
         return ResponseEntity.ok().body(list);
     }
 
@@ -112,7 +107,7 @@ public class TaskController {
                                                                         @RequestParam(name = "creator", required = false) Long cId,
                                                                         @RequestParam(name = "executor", required = false) Long eId,
                                                                         @RequestParam(name = "status", required = false) List<StatusTask> statuses) {
-        logger.info("Выполнен запрос на получение списка задач с возможностью фильтрации");
+        logger.info(String.format(REQUEST, "GET", "/tasks"));
         List<TaskResponseDto> list = service.readListAllTasksByFilters(name, description, rId, cId, eId, statuses);
         logger.info("Список задач получен");
         return ResponseEntity.ok().body(list);
@@ -121,13 +116,9 @@ public class TaskController {
     @PostMapping(value = "/tasks/upload")
     @Operation(summary = "Создание новых задач из csv-файла")
     public ResponseEntity<String> createTasksFromCSV(@RequestParam(name = "file") MultipartFile file) {
+        logger.info(String.format(REQUEST, "POST", "/tasks/upload"));
         String filename = csvService.saveFile(file);
         String response = csvService.createFromCSV(filename);
         return ResponseEntity.ok().body(response);
-    }
-
-    @ExceptionHandler(value = FileNotFoundException.class)
-    public ResponseEntity<?> handlerException() {
-        return ResponseEntity.notFound().build();
     }
 }
