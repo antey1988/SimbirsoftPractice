@@ -1,5 +1,6 @@
 package com.example.SimbirsoftPractice.feign;
 
+import com.example.SimbirsoftPractice.config.FeignPaymentClientConfiguration;
 import com.example.SimbirsoftPractice.rest.dto.CustomerWithUUIDRequestDto;
 import com.example.SimbirsoftPractice.rest.dto.PaymentProjectRequestDto;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -10,7 +11,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 @Component
 @FeignClient(name = "${feign.client.name}",
-                url = "${feign.client.url}")
+                url = "${feign.client.url}",
+                configuration = FeignPaymentClientConfiguration.class)
 public interface PaymentClient {
     @PostMapping(value = "/clients")
     ResponseEntity<String> createClient(@RequestBody CustomerWithUUIDRequestDto request);

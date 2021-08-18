@@ -1,8 +1,8 @@
 package com.example.SimbirsoftPractice.rest.controllers;
 
 import com.example.SimbirsoftPractice.feign.NotAvailablePaymentServiceException;
+import com.example.SimbirsoftPractice.rest.controllers.exceptions.NotEnoughMoneyException;
 import com.example.SimbirsoftPractice.rest.controllers.exceptions.NotFoundException;
-import com.example.SimbirsoftPractice.rest.controllers.exceptions.TestRuntimeException;
 import com.example.SimbirsoftPractice.rest.domain.exceptions.IllegalStatusException;
 import com.example.SimbirsoftPractice.rest.domain.exceptions.NullValueFieldException;
 import com.example.SimbirsoftPractice.rest.domain.exceptions.NullValueObjectException;
@@ -15,14 +15,15 @@ import java.io.IOException;
 
 @RestControllerAdvice
 public class ErrorController {
-//    @ExceptionHandler({IOException.class, TestRuntimeException.class})
-//    public ResponseEntity<String> handlerException(Exception e) {
-//        return new ResponseEntity(e.toString(), HttpStatus.BAD_REQUEST);
-//    }
 
     @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<String> handleNotFoundException(RuntimeException e) {
+    public ResponseEntity<String> handleNotFoundException(NotFoundException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+    }
+
+    @ExceptionHandler(NotEnoughMoneyException.class)
+    public ResponseEntity<String> handleNotEnoughMoneyException(NotEnoughMoneyException e) {
+        return ResponseEntity.status(HttpStatus.PAYMENT_REQUIRED).body(e.getMessage());
     }
 
     @ExceptionHandler({IllegalStatusException.class, NullValueFieldException.class, NullValueObjectException.class})

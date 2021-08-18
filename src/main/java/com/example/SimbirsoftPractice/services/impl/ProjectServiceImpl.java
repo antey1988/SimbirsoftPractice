@@ -10,6 +10,7 @@ import com.example.SimbirsoftPractice.rest.domain.StatusProject;
 import com.example.SimbirsoftPractice.rest.dto.PaymentProjectRequestDto;
 import com.example.SimbirsoftPractice.rest.dto.ProjectRequestDto;
 import com.example.SimbirsoftPractice.rest.dto.ProjectResponseDto;
+import com.example.SimbirsoftPractice.services.PaymentService;
 import com.example.SimbirsoftPractice.services.ProjectService;
 import com.example.SimbirsoftPractice.services.ProjectValidatorService;
 import feign.RetryableException;
@@ -31,13 +32,14 @@ public class ProjectServiceImpl implements ProjectService {
     private final ProjectMapper mapper;
     private final ProjectRepository repository;
     private final ProjectValidatorService validator;
-    private final PaymentClient paymentClient;
+    private final PaymentService paymentService;
 
-    public ProjectServiceImpl(ProjectMapper mapper, ProjectRepository repository, ProjectValidatorService validator, PaymentClient paymentClient) {
+    public ProjectServiceImpl(ProjectMapper mapper, ProjectRepository repository,
+                              ProjectValidatorService validator, PaymentService paymentService) {
         this.mapper = mapper;
         this.repository = repository;
         this.validator = validator;
-        this.paymentClient = paymentClient;
+        this.paymentService = paymentService;
     }
 
     @Override
@@ -61,7 +63,8 @@ public class ProjectServiceImpl implements ProjectService {
         projectEntity =  validator.validateInputValue(projectRequestDto, projectEntity);
         ProjectResponseDto response = mapper.entityToResponseDto(projectEntity);
         if (projectEntity.getStatus() == StatusProject.OPEN) {
-            createOperationInPaymentService(projectEntity);
+            PaymentProjectRequestDto payment = mapper.entityToPaymentProjectRequestDto(projectEntity);
+            paymentService.payProject(payment);
         }
         logger.info("Запись обновлена в базе данных");
         return response;
@@ -96,21 +99,5 @@ public class ProjectServiceImpl implements ProjectService {
         });
         logger.info(String.format("Запись c id = %d успешно извлечена из базы данных", id));
         return entity;
-    }
-
-    //обращение к платежному сервису для списание денежных средств за работу по проекту
-    private void createOperationInPaymentService(ProjectEntity project) {
-        PaymentProjectRequestDto payment = mapper.entityToPaymentProjectRequestDto(project);
-        try {
-            ResponseEntity<String> response = paymentClient.payProject(payment);
-            logger.info(response.getBody());
-        } catch (RetryableException e) {
-            String text = "Платежный сервис не доступен";
-            logger.warn(text);
-            logger.warn(e.getMessage());
-            throw new NotAvailablePaymentServiceException(text);
-        } catch (Exception e) {
-            e.getMessage();
-        }
     }
 }
