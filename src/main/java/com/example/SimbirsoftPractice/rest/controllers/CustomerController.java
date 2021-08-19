@@ -7,8 +7,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,7 +19,6 @@ import java.util.Locale;
 public class CustomerController {
     private static final String REQUEST = "Request: %s " +
             "http://localhost:8080/api/customers" + "%s";
-    private static final Locale locale = Locale.getDefault();
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final CustomerService service;
 
@@ -39,7 +36,8 @@ public class CustomerController {
 
     @GetMapping(value = "/{id}")
     @Operation(summary = "Информация о клиенте")
-    public ResponseEntity<CustomerResponseDto> getCustomer(@PathVariable Long id, @RequestHeader HttpHeaders headers) {
+    public ResponseEntity<CustomerResponseDto> getCustomer(@PathVariable Long id,
+                                                           Locale locale) {
         logger.info(String.format(REQUEST, "GET", "/" + id));
         CustomerResponseDto customerResponseDto = service.readCustomer(id, locale);
         return ResponseEntity.ok(customerResponseDto);
@@ -47,9 +45,10 @@ public class CustomerController {
 
     @PostMapping
     @Operation(summary = "Создание нового клиента")
-    public ResponseEntity<CustomerResponseDto> createCustomer(@RequestBody CustomerRequestDto requestDto) {
+    public ResponseEntity<CustomerResponseDto> createCustomer(@RequestBody CustomerRequestDto requestDto,
+                                                              Locale locale) {
         logger.info(String.format(REQUEST, "POST", ""));
-        CustomerResponseDto customerResponseDto = service.createCustomer(requestDto);
+        CustomerResponseDto customerResponseDto = service.createCustomer(requestDto, locale);
         return ResponseEntity.ok(customerResponseDto);
     }
 
@@ -57,7 +56,7 @@ public class CustomerController {
     @Operation(summary = "Изменение информации о клиенте")
     public ResponseEntity<CustomerResponseDto> updateCustomer(@RequestBody CustomerRequestDto requestDto,
                                                               @PathVariable Long id,
-                                                              @RequestHeader HttpHeaders headers) {
+                                                              Locale locale) {
         logger.info(String.format(REQUEST, "PUT", "/" + id));
         CustomerResponseDto customerResponseDto = service.updateCustomer(requestDto, id, locale);
         return ResponseEntity.ok(customerResponseDto);
@@ -65,9 +64,10 @@ public class CustomerController {
 
     @DeleteMapping(value = "/{id}")
     @Operation(summary = "Удаление клиента")
-    public ResponseEntity<?> deleteCustomer(@PathVariable Long id, @RequestHeader HttpHeaders headers) {
+    public ResponseEntity<?> deleteCustomer(@PathVariable Long id, Locale locale) {
         logger.info(String.format(REQUEST, "DELETE", "/" + id));
         service.deleteCustomer(id, locale);
         return ResponseEntity.accepted().build();
     }
+
 }

@@ -1,4 +1,4 @@
-package com.example.SimbirsoftPractice.validators;
+package com.example.SimbirsoftPractice.validators.test;
 
 public enum TypeValid {
     ON_CREATION,

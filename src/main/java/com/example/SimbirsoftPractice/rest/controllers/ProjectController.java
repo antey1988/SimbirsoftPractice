@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Locale;
 
 @RestController
 @RequestMapping("/api/projects")
@@ -27,34 +28,34 @@ public class ProjectController {
 
     @PostMapping
     @Operation(summary = "Создание нового проекта")
-    public ResponseEntity<ProjectResponseDto> createProject(@RequestBody ProjectRequestDto requestDto) {
+    public ResponseEntity<ProjectResponseDto> createProject(@RequestBody ProjectRequestDto requestDto, Locale locale) {
         logger.info(String.format(REQUEST, "POST", ""));
-        ProjectResponseDto projectResponseDto = service.createProject(requestDto);
+        ProjectResponseDto projectResponseDto = service.createProject(requestDto, locale);
         return ResponseEntity.ok().body(projectResponseDto);
     }
 
     @GetMapping(value = "/{id}")
     @Operation(summary = "Просмотр информации о проекте")
-    public ResponseEntity<ProjectResponseDto> getProject(@PathVariable Long id) {
+    public ResponseEntity<ProjectResponseDto> getProject(@PathVariable Long id, Locale locale) {
         logger.info(String.format(REQUEST, "GET", "/" + id));
-        ProjectResponseDto projectResponseDto = service.readProject(id);
+        ProjectResponseDto projectResponseDto = service.readProject(id, locale);
         return ResponseEntity.ok().body(projectResponseDto);
     }
 
     @PutMapping(value = "/{id}")
     @Operation(summary = "Изменение информации о проекте")
     public ResponseEntity<ProjectResponseDto> updateProject(@RequestBody ProjectRequestDto requestDto,
-                                                      @PathVariable Long id) {
+                                                      @PathVariable Long id, Locale locale) {
         logger.info(String.format(REQUEST, "PUT", "/" + id));
-        ProjectResponseDto projectResponseDto = service.updateProject(requestDto, id);
+        ProjectResponseDto projectResponseDto = service.updateProject(requestDto, id, locale);
         return ResponseEntity.ok().body(projectResponseDto);
     }
 
     @DeleteMapping(value = "/{id}")
     @Operation(summary = "Удаление проекта")
-    public ResponseEntity<?> deleteProject(@PathVariable Long id) {
+    public ResponseEntity<?> deleteProject(@PathVariable Long id, Locale locale) {
         logger.info(String.format(REQUEST, "DELETE", "/" + id));
-        service.deleteProject(id);
+        service.deleteProject(id, locale);
         return ResponseEntity.accepted().build();
     }
 

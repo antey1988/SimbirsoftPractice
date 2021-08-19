@@ -1,4 +1,4 @@
-package com.example.SimbirsoftPractice.validators;
+package com.example.SimbirsoftPractice.validators.test;
 
 import com.example.SimbirsoftPractice.rest.domain.exceptions.NullValueFieldException;
 import org.slf4j.Logger;

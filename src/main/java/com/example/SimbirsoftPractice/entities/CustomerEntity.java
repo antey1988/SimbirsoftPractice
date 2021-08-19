@@ -1,6 +1,6 @@
 package com.example.SimbirsoftPractice.entities;
 
-import com.example.SimbirsoftPractice.validators.ValidNotNull;
+import com.example.SimbirsoftPractice.validators.test.ValidNotNull;
 
 import javax.persistence.Entity;
 import javax.persistence.Table;

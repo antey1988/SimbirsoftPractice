@@ -1,8 +1,7 @@
 package com.example.SimbirsoftPractice.services.impl;
 
 import com.example.SimbirsoftPractice.entities.ProjectEntity;
-import com.example.SimbirsoftPractice.feign.NotAvailablePaymentServiceException;
-import com.example.SimbirsoftPractice.feign.PaymentClient;
+import com.example.SimbirsoftPractice.entities.UserEntity;
 import com.example.SimbirsoftPractice.mappers.ProjectMapper;
 import com.example.SimbirsoftPractice.repos.ProjectRepository;
 import com.example.SimbirsoftPractice.rest.controllers.exceptions.NotFoundException;
@@ -12,69 +11,70 @@ import com.example.SimbirsoftPractice.rest.dto.ProjectRequestDto;
 import com.example.SimbirsoftPractice.rest.dto.ProjectResponseDto;
 import com.example.SimbirsoftPractice.services.PaymentService;
 import com.example.SimbirsoftPractice.services.ProjectService;
-import com.example.SimbirsoftPractice.services.ProjectValidatorService;
-import feign.RetryableException;
+import com.example.SimbirsoftPractice.services.validators.ProjectValidatorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.ResponseEntity;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 @Service
 public class ProjectServiceImpl implements ProjectService {
 
-    private static final String NOT_FOUND_PROJECT = "Проект с id = %d не существует";
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private final ProjectMapper mapper;
     private final ProjectRepository repository;
     private final ProjectValidatorService validator;
+    private final MessageSource messageSource;
     private final PaymentService paymentService;
 
-    public ProjectServiceImpl(ProjectMapper mapper, ProjectRepository repository,
-                              ProjectValidatorService validator, PaymentService paymentService) {
+    public ProjectServiceImpl(ProjectMapper mapper, ProjectRepository repository, ProjectValidatorService validator,
+                              MessageSource messageSource, PaymentService paymentService) {
         this.mapper = mapper;
         this.repository = repository;
         this.validator = validator;
+        this.messageSource = messageSource;
         this.paymentService = paymentService;
     }
 
     @Override
-    public ProjectResponseDto createProject(ProjectRequestDto projectRequestDto) {
-        ProjectEntity projectEntity = validator.validateInputValue(projectRequestDto, new ProjectEntity());
+    public ProjectResponseDto createProject(ProjectRequestDto projectRequestDto, Locale locale) {
+        ProjectEntity projectEntity = validator.validate(projectRequestDto, new ProjectEntity(), locale);
         projectEntity = repository.save(projectEntity);
-        logger.info("Новая запись добавлена в базу данных");
+        logger.info("New Project added to DB");
         return mapper.entityToResponseDto(projectEntity);
     }
 
     @Override
-    public ProjectResponseDto readProject(Long id) {
-        ProjectEntity projectEntity = getOrElseThrow(id);
+    public ProjectResponseDto readProject(Long id, Locale locale) {
+        ProjectEntity projectEntity = getOrElseThrow(id, locale);
         return mapper.entityToResponseDto(projectEntity);
     }
 
     @Override
     @Transactional
-    public ProjectResponseDto updateProject(ProjectRequestDto projectRequestDto, Long id) {
-        ProjectEntity projectEntity = getOrElseThrow(id);
-        projectEntity =  validator.validateInputValue(projectRequestDto, projectEntity);
+    public ProjectResponseDto updateProject(ProjectRequestDto projectRequestDto, Long id, Locale locale) {
+        ProjectEntity projectEntity = getOrElseThrow(id, locale);
+        projectEntity =  validator.validate(projectRequestDto, projectEntity, locale);
         ProjectResponseDto response = mapper.entityToResponseDto(projectEntity);
         if (projectEntity.getStatus() == StatusProject.OPEN) {
             PaymentProjectRequestDto payment = mapper.entityToPaymentProjectRequestDto(projectEntity);
-            paymentService.payProject(payment);
+            paymentService.payProject(payment, locale);
         }
-        logger.info("Запись обновлена в базе данных");
+        logger.info("Project updated in the DB");
         return response;
     }
 
     @Override
-    public void deleteProject(Long id) {
-        getOrElseThrow(id);
+    public void deleteProject(Long id, Locale locale) {
+        getOrElseThrow(id, locale);
         repository.deleteById(id);
-        logger.info("Запись удалена из базы данных");
+        logger.info("Project deleted from DB");
     }
 
     @Override
@@ -82,22 +82,22 @@ public class ProjectServiceImpl implements ProjectService {
         List<ProjectEntity> list;
         if (id == null) {
             list = repository.findAll();
-            logger.info("Список записей извлечен из базы данных");
+            logger.info("All records retrieved from the DB");
         } else {
             list = repository.findByCustomerId(id);
-            logger.info(String.format("Список записей со значение поля custom_id = %d извлечен из базы данных", id));
+            logger.info(String.format("Records with field custom_id = %d retrieved from the DB", id));
         }
         return mapper.listEntityToListResponseDto(list);
     }
 
-    private ProjectEntity getOrElseThrow(Long id) {
-        logger.info(String.format("Попытка извлечения записи c id = %d из базы данных", id));
-        Optional<ProjectEntity> projectEntity = repository.findById(id);
-        ProjectEntity entity = projectEntity.orElseThrow(() -> {
-            logger.warn(String.format("Запись c id = %d отсутсвует в базе данных", id));
-            return new NotFoundException(String.format(NOT_FOUND_PROJECT, id));
+    private ProjectEntity getOrElseThrow(Long id, Locale locale ) {
+        logger.info(String.format("Extracting Project with identifier(id) = %d from DB", id));
+        Optional<ProjectEntity> optional = repository.findById(id);
+        return optional.orElseThrow(() -> {
+            logger.error(String.format("Project with identifier (id) =% d does not exist", id));
+            String error = messageSource.getMessage("error.NotFound", null, locale);
+            String record = messageSource.getMessage("record.Project", null, locale);
+            return new NotFoundException(String.format(error, record, id));
         });
-        logger.info(String.format("Запись c id = %d успешно извлечена из базы данных", id));
-        return entity;
     }
 }

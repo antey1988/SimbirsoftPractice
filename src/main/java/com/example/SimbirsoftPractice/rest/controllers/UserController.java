@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Locale;
 
 @RestController
 @RequestMapping("/api/users")
@@ -42,34 +43,34 @@ public class UserController {
 
     @GetMapping(value = "/{id}")
     @Operation(summary = "Информация о пользователе")
-    public ResponseEntity<UserResponseDto> readUser(@PathVariable Long id) {
+    public ResponseEntity<UserResponseDto> readUser(@PathVariable Long id, Locale locale) {
         logger.info(String.format(REQUEST, "GET", "/" + id));
-        UserResponseDto userResponseDto = service.readUser(id);
+        UserResponseDto userResponseDto = service.readUser(id, locale);
         return ResponseEntity.ok().body(userResponseDto);
     }
 
     @PostMapping
     @Operation(summary = "Создание нового пользователя")
-    public ResponseEntity<UserResponseDto> createUser(@RequestBody UserRequestDto requestDto) {
+    public ResponseEntity<UserResponseDto> createUser(@RequestBody UserRequestDto requestDto, Locale locale) {
         logger.info(String.format(REQUEST, "POST", ""));
-        UserResponseDto userResponseDto = service.createUser(requestDto);
+        UserResponseDto userResponseDto = service.createUser(requestDto, locale);
         return ResponseEntity.ok().body(userResponseDto);
     }
 
     @PutMapping(value = "/{id}")
     @Operation(summary = "Изменение данных о пользователе")
     public ResponseEntity<UserResponseDto> updateUser(@RequestBody UserRequestDto requestDto,
-                                                      @PathVariable Long id) {
+                                                      @PathVariable Long id, Locale locale) {
         logger.info(String.format(REQUEST, "PUT", "/" + id));
-        UserResponseDto userResponseDto = service.updateUser(requestDto, id);
+        UserResponseDto userResponseDto = service.updateUser(requestDto, id, locale);
         return ResponseEntity.ok().body(userResponseDto);
     }
 
     @DeleteMapping(value = "/{id}")
     @Operation(summary = "Удаление пользователя")
-    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
+    public ResponseEntity<?> deleteUser(@PathVariable Long id, Locale locale) {
         logger.info(String.format(REQUEST, "DELETE", "/" + id));
-        service.deleteUser(id);
+        service.deleteUser(id, locale);
         return ResponseEntity.accepted().build();
     }
 }

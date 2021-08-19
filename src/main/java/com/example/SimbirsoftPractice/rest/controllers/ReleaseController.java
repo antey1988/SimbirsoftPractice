@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Locale;
 
 @RestController
 @RequestMapping("/api")
@@ -42,34 +43,34 @@ public class ReleaseController {
 
     @PostMapping(value = "/releases")
     @Operation(summary = "Создание нового релиза")
-    public ResponseEntity<ReleaseResponseDto> createRelease(@RequestBody ReleaseRequestDto requestDto) {
+    public ResponseEntity<ReleaseResponseDto> createRelease(@RequestBody ReleaseRequestDto requestDto, Locale locale) {
         logger.info(String.format(REQUEST, "POST", "/releases"));
-        ReleaseResponseDto responseDto = releaseService.createRelease(requestDto);
+        ReleaseResponseDto responseDto = releaseService.createRelease(requestDto, locale);
         return ResponseEntity.ok().body(responseDto);
     }
 
     @GetMapping(value = "/releases/{id}")
     @Operation(summary = "Информация о релизе")
-    public ResponseEntity<ReleaseResponseDto> readRelease(@PathVariable Long id) {
+    public ResponseEntity<ReleaseResponseDto> readRelease(@PathVariable Long id, Locale locale) {
         logger.info(String.format(REQUEST, "GET", "/releases/" + id));
-        ReleaseResponseDto responseDto = releaseService.readRelease(id);
+        ReleaseResponseDto responseDto = releaseService.readRelease(id, locale);
         return ResponseEntity.ok().body(responseDto);
     }
 
     @PutMapping(value = "/releases/{id}")
     @Operation(summary = "Изменение релиза")
     public ResponseEntity<ReleaseResponseDto> updateRelease(@RequestBody ReleaseRequestDto requestDto,
-                                                      @PathVariable Long id) {
+                                                      @PathVariable Long id, Locale locale) {
         logger.info(String.format(REQUEST, "PUT", "/releases/" + id));
-        ReleaseResponseDto responseDto = releaseService.updateRelease(requestDto, id);
+        ReleaseResponseDto responseDto = releaseService.updateRelease(requestDto, id, locale);
         return ResponseEntity.ok().body(responseDto);
     }
 
     @DeleteMapping(value = "/releases/{id}")
     @Operation(summary = "Удаление релиза")
-    public ResponseEntity<?> deleteRelease(@PathVariable Long id) {
+    public ResponseEntity<?> deleteRelease(@PathVariable Long id, Locale locale) {
         logger.info(String.format(REQUEST, "DELETE", "/releases/" + id));
-        releaseService.deleteRelease(id);
+        releaseService.deleteRelease(id, locale);
         return ResponseEntity.accepted().build();
     }
 }

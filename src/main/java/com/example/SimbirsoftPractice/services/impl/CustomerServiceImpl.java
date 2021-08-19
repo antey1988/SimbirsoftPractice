@@ -7,7 +7,7 @@ import com.example.SimbirsoftPractice.rest.controllers.exceptions.NotFoundExcept
 import com.example.SimbirsoftPractice.rest.dto.CustomerRequestDto;
 import com.example.SimbirsoftPractice.rest.dto.CustomerResponseDto;
 import com.example.SimbirsoftPractice.services.CustomerService;
-import com.example.SimbirsoftPractice.services.CustomerValidatorService;
+import com.example.SimbirsoftPractice.services.validators.CustomerValidatorService;
 import com.example.SimbirsoftPractice.services.PaymentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,44 +46,45 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     @Transactional
-    public CustomerResponseDto createCustomer(CustomerRequestDto customerRequestDto) {
-        CustomerEntity customerEntity = validator.validateOnCreation(customerRequestDto, new CustomerEntity());
+    public CustomerResponseDto createCustomer(CustomerRequestDto customerRequestDto, Locale locale) {
+        CustomerEntity customerEntity = validator.validate(customerRequestDto, new CustomerEntity(), locale);
         customerEntity = repository.save(customerEntity);
-        CustomerResponseDto response = mapper.entityToResponseDto(customerEntity);
-        paymentService.createClient(mapper.entityToResponseDtoWithUUID(customerEntity));
-        logger.info("New record added to DB");
-        return response;
+        paymentService.createClient(mapper.entityToResponseDtoWithUUID(customerEntity), locale);
+        logger.info("New Customer added to DB");
+        return mapper.entityToResponseDto(customerEntity);
     }
 
     @Override
     @Transactional
     public CustomerResponseDto updateCustomer(CustomerRequestDto customerRequestDto, Long id, Locale locale) {
         CustomerEntity customerEntity = getOrElseThrow(id, locale);
-        customerEntity = validator.validateOnUpdate(customerRequestDto, customerEntity);
-        logger.info("Record updated in the DB");
+        customerEntity = validator.validate(customerRequestDto, customerEntity, locale);
+        logger.info("Customer updated in the DB");
         return mapper.entityToResponseDto(customerEntity);
     }
 
     @Override
     public void deleteCustomer(Long id, Locale locale) {
-        CustomerEntity customerEntity = getOrElseThrow(id, locale);
+        getOrElseThrow(id, locale);
         repository.deleteById(id);
-        logger.info("Record deleted from database");
+        logger.info("Customer deleted from DB");
     }
 
     @Override
     public List<CustomerResponseDto> getListCustomers() {
         List<CustomerEntity> list = repository.findAll();
-        logger.info("All records retrieved from the DB");
+        logger.info("All Customers retrieved from the DB");
         return mapper.listEntityToListResponseDto(list);
     }
 
     private CustomerEntity getOrElseThrow(Long id, Locale locale ) {
-        logger.info(String.format("Extracting record with identifier(id) = %d from DB", id));
-        Optional<CustomerEntity> optionalCustomer = repository.findById(id);
-        return optionalCustomer.orElseThrow(() -> {
-            logger.warn(String.format("Record with identifier (id) =% d does not exist", id));
-            return new NotFoundException(String.format(messageSource.getMessage("error.NotFound", null, locale), id));
+        logger.info(String.format("Extracting Customer with identifier(id) = %d from DB", id));
+        Optional<CustomerEntity> optional = repository.findById(id);
+        return optional.orElseThrow(() -> {
+            logger.warn(String.format("Customer with identifier (id) =% d does not exist", id));
+            String error = messageSource.getMessage("error.NotFound", null, locale);
+            String record = messageSource.getMessage("record.Customer", null, locale);
+            return new NotFoundException(String.format(error, record, id));
         });
     }
 }

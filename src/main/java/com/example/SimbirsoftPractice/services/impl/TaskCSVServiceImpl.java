@@ -4,16 +4,15 @@ import com.example.SimbirsoftPractice.entities.TaskEntity;
 import com.example.SimbirsoftPractice.mappers.TaskMapper;
 import com.example.SimbirsoftPractice.repos.TaskRepository;
 import com.example.SimbirsoftPractice.rest.dto.TaskRequestDto;
-import com.example.SimbirsoftPractice.rest.dto.TaskResponseDto;
 import com.example.SimbirsoftPractice.security.IDable;
-import com.example.SimbirsoftPractice.security.UserWithId;
 import com.example.SimbirsoftPractice.services.TaskCSVService;
-import com.example.SimbirsoftPractice.services.TaskValidatorService;
+import com.example.SimbirsoftPractice.services.validators.TaskValidatorService;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.MessageSource;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -25,33 +24,24 @@ import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 public class TaskCSVServiceImpl implements TaskCSVService {
 
-    private static final String INFO_FILE_SAVED = "Файл %s сохранен в каталоге %s";
-    private static final String WARN_RECORD_NOT_CORRECT = "Строка %d содержит не корректрую информацию: %s";
-    private static final String INFO_RESPONSE = "Количество созданных задач: %d\n" +
-            "Не созданных задач %d:" +
-            "%s";
-
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private final Path rootDirectory;
-//            = Paths.get(Objects.requireNonNull(this.getClass().getResource("")).getPath()).resolve("upload");
     private final TaskValidatorService validator;
     private final TaskRepository repository;
-    private final TaskMapper mapper;
+    private final MessageSource messageSource;
 
-    public TaskCSVServiceImpl(TaskValidatorService validator, TaskRepository repository, TaskMapper mapper) {
+    public TaskCSVServiceImpl(TaskValidatorService validator, TaskRepository repository, MessageSource messageSource) {
         this.validator = validator;
         this.repository = repository;
-        this.mapper = mapper;
-        String resource = Objects.requireNonNull(this.getClass().getResource("/")).getPath();
-        resource = resource.startsWith("/") ? resource.substring(1) : resource;
+        this.messageSource = messageSource;
+        String resource = Objects.requireNonNull(this.getClass().getResource(".")).getPath();
+        resource = System.getProperty("os.name").equalsIgnoreCase("windows") ? resource.substring(1) : resource;
         rootDirectory = Paths.get(resource).resolve("upload");
         initDirectory();
     }
@@ -60,26 +50,28 @@ public class TaskCSVServiceImpl implements TaskCSVService {
         try {
             Files.createDirectories(rootDirectory);
         } catch (IOException e) {
-            throw new RuntimeException("Не возможно создать директорию для сохранения файлов");
+            throw new RuntimeException(e);
         }
     }
 
     @Override
-    public String saveFile(MultipartFile file) {
+    public String saveFile(MultipartFile file, Locale locale) {
         String fileName = file.getOriginalFilename();
         try {
             Path path = rootDirectory.resolve(fileName);
             Files.deleteIfExists(path);
             Files.copy(file.getInputStream(), path);
-            logger.info(String.format(INFO_FILE_SAVED, fileName, rootDirectory));
+            logger.info(String.format("File %s saved in %s directory", fileName, rootDirectory));
             return fileName;
         } catch (Exception e) {
-            throw new RuntimeException("Не удалось сохранить файл");
+            logger.error("Failed to save file");
+            logger.error(e.getMessage());
+            throw new RuntimeException(messageSource.getMessage("csv.notSaveFile", null, locale));
         }
     }
 
     @Override
-    public String createFromCSV(String filename) {
+    public String createFromCSV(String filename, Locale locale) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Long id = ((IDable)(authentication.getPrincipal())).getId();
         List<String> badTask = new ArrayList<>();
@@ -101,11 +93,16 @@ public class TaskCSVServiceImpl implements TaskCSVService {
                         dto.setDescription(record.get("description"));
                         dto.setRelease(Long.parseLong(record.get("release")));
                         dto.setCreator(id);
-                        entity = validator.validateInputValue(dto, new TaskEntity());
+                        entity = validator.validate(dto, new TaskEntity(), locale);
                     } catch (RuntimeException e) {
-                        String text = String.format(WARN_RECORD_NOT_CORRECT, record.getRecordNumber(), e.getMessage());
-                        logger.warn(text);
-                        badTask.add("\n" + text);
+                        //пишем в лог
+                        String warn = String.format("Line %d contains incorrect information: %s",
+                                record.getRecordNumber(), e.getMessage());
+                        logger.warn(warn);
+                        //сохраняемв список для оповещения пользователя
+                        warn = String.format(messageSource.getMessage("csv.notCorrectLine", null, locale),
+                                record.getRecordNumber(), e.getMessage());
+                        badTask.add("\n" + warn);
                         continue;
                     }
                     newTasks.add(entity);
@@ -117,6 +114,7 @@ public class TaskCSVServiceImpl implements TaskCSVService {
         }
         StringBuilder bad = new StringBuilder();
         badTask.forEach(bad::append);
-        return String.format(INFO_RESPONSE, newTasks.size(), badTask.size(), bad);
+        String warn = messageSource.getMessage("csv.response", null, locale);
+        return String.format(warn, newTasks.size(), badTask.size(), bad);
     }
 }

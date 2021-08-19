@@ -24,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileNotFoundException;
 import java.util.List;
+import java.util.Locale;
 
 @RestController
 @RequestMapping("/api")
@@ -42,17 +43,17 @@ public class TaskController {
 
     @PostMapping(value = "/tasks")
     @Operation(summary = "Создание новой задачи")
-    public ResponseEntity<TaskResponseDto> createTask(@RequestBody TaskRequestDto requestDto) {
+    public ResponseEntity<TaskResponseDto> createTask(@RequestBody TaskRequestDto requestDto, Locale locale) {
         logger.info(String.format(REQUEST, "POST", "/tasks"));
-        TaskResponseDto responseDto = service.createTask(requestDto);
+        TaskResponseDto responseDto = service.createTask(requestDto, locale);
         return ResponseEntity.ok().body(responseDto);
     }
 
     @GetMapping(value = "/tasks/{id}")
     @Operation(summary = "Просмотр состояния задачи")
-    public ResponseEntity<TaskResponseDto> readTask(@PathVariable Long id) {
+    public ResponseEntity<TaskResponseDto> readTask(@PathVariable Long id, Locale locale) {
         logger.info(String.format(REQUEST, "GET", "/tasks/" + id));
-        TaskResponseDto responseDto = service.readTask(id);
+        TaskResponseDto responseDto = service.readTask(id, locale);
         logger.info(String.format("Информация о задаче с id = %d получена", id));
         return ResponseEntity.ok().body(responseDto);
     }
@@ -60,17 +61,17 @@ public class TaskController {
     @PutMapping(value = "/tasks/{id}")
     @Operation(summary = "Изменение состояния задачи")
     public ResponseEntity<TaskResponseDto> updateTask(@RequestBody TaskRequestDto requestDto,
-                                                         @PathVariable Long id) {
+                                                         @PathVariable Long id, Locale locale) {
         logger.info(String.format(REQUEST, "PUT", "/tasks/" + id));
-        TaskResponseDto responseDto = service.updateTask(requestDto, id);
+        TaskResponseDto responseDto = service.updateTask(requestDto, id, locale);
         return ResponseEntity.ok().body(responseDto);
     }
 
     @DeleteMapping(value = "/tasks/{id}")
     @Operation(summary = "Удаление задачи")
-    public ResponseEntity<?> deleteTask(@PathVariable Long id) {
+    public ResponseEntity<?> deleteTask(@PathVariable Long id, Locale locale) {
         logger.info(String.format(REQUEST, "DELETE", "/tasks/" + id));
-        service.deleteTask(id);
+        service.deleteTask(id, locale);
         return ResponseEntity.accepted().build();
     }
 
@@ -109,16 +110,15 @@ public class TaskController {
                                                                         @RequestParam(name = "status", required = false) List<StatusTask> statuses) {
         logger.info(String.format(REQUEST, "GET", "/tasks"));
         List<TaskResponseDto> list = service.readListAllTasksByFilters(name, description, rId, cId, eId, statuses);
-        logger.info("Список задач получен");
         return ResponseEntity.ok().body(list);
     }
 
     @PostMapping(value = "/tasks/upload")
     @Operation(summary = "Создание новых задач из csv-файла")
-    public ResponseEntity<String> createTasksFromCSV(@RequestParam(name = "file") MultipartFile file) {
+    public ResponseEntity<String> createTasksFromCSV(@RequestParam(name = "file") MultipartFile file, Locale locale) {
         logger.info(String.format(REQUEST, "POST", "/tasks/upload"));
-        String filename = csvService.saveFile(file);
-        String response = csvService.createFromCSV(filename);
+        String filename = csvService.saveFile(file, locale);
+        String response = csvService.createFromCSV(filename, locale);
         return ResponseEntity.ok().body(response);
     }
 }
