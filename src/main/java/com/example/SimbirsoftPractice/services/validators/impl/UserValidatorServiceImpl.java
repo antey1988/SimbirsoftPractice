@@ -1,6 +1,7 @@
 package com.example.SimbirsoftPractice.services.validators.impl;
 
 import com.example.SimbirsoftPractice.entities.UserEntity;
+import com.example.SimbirsoftPractice.rest.domain.Role;
 import com.example.SimbirsoftPractice.rest.domain.exceptions.NullValueFieldException;
 import com.example.SimbirsoftPractice.rest.dto.UserRequestDto;
 import com.example.SimbirsoftPractice.services.validators.UserValidatorService;
@@ -10,7 +11,10 @@ import org.springframework.context.MessageSource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 @Service
 public class UserValidatorServiceImpl implements UserValidatorService {
@@ -29,6 +33,7 @@ public class UserValidatorServiceImpl implements UserValidatorService {
     public UserEntity validate(UserRequestDto dto, UserEntity entity, Locale locale) {
         validateName(dto, entity, locale);
         validatePassword(dto, entity, locale);
+        validateRoles(dto, entity);
         return entity;
     }
 
@@ -63,6 +68,14 @@ public class UserValidatorServiceImpl implements UserValidatorService {
         if (nValue != null) {
             entity.setName(encoder.encode(nValue));
             logger.info("Field Password changed successfully");
+        }
+    }
+
+    private void validateRoles(UserRequestDto dto, UserEntity entity) {
+        Set<Role> set = dto.getRoles();
+        if (set != null) {
+            entity.getRoles().clear();
+            entity.getRoles().addAll(set);
         }
     }
 }

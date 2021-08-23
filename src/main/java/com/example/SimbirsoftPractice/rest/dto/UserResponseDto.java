@@ -4,7 +4,9 @@ import com.example.SimbirsoftPractice.rest.domain.Role;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Schema(description = "Данные о пользователе (from back to front)")
 public class UserResponseDto {
@@ -13,19 +15,7 @@ public class UserResponseDto {
     @Schema(description = "Имя пользователя")
     private String name;
     @Schema(description = "Роли пользователя")
-    private List<Role> roles;
-
-    public UserResponseDto(Long id, String name) {
-        this.id = id;
-        this.name = name;
-        this.roles = new ArrayList<>();
-    }
-
-    public UserResponseDto(Long id, String name, List<Role> roles) {
-        this.id = id;
-        this.name = name;
-        this.roles = roles;
-    }
+    private Set<Role> roles = new HashSet<>();
 
     public UserResponseDto() {
     }
@@ -46,11 +36,11 @@ public class UserResponseDto {
         this.name = name;
     }
 
-    public List<Role> getRoles() {
+    public Set<Role> getRoles() {
         return roles;
     }
 
-    public void setRoles(List<Role> roles) {
+    public void setRoles(Set<Role> roles) {
         this.roles = roles;
     }
 }

@@ -9,7 +9,6 @@ import javax.persistence.Column;
 import javax.persistence.ManyToOne;
 import javax.persistence.FetchType;
 import java.util.Date;
-
 @Entity
 @Table(name = "releases")
 public class ReleaseEntity {

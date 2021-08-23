@@ -92,4 +92,60 @@ public class TaskResponseDto {
     public void setBorder(int border) {
         this.border = border;
     }
+
+    public boolean equals(final Object o) {
+        if (o == this) return true;
+        if (!(o instanceof TaskResponseDto)) return false;
+        final TaskResponseDto other = (TaskResponseDto) o;
+        if (!other.canEqual((Object) this)) return false;
+        final Object this$id = this.getId();
+        final Object other$id = other.getId();
+        if (this$id == null ? other$id != null : !this$id.equals(other$id)) return false;
+        final Object this$name = this.getName();
+        final Object other$name = other.getName();
+        if (this$name == null ? other$name != null : !this$name.equals(other$name)) return false;
+        final Object this$description = this.getDescription();
+        final Object other$description = other.getDescription();
+        if (this$description == null ? other$description != null : !this$description.equals(other$description))
+            return false;
+        final Object this$creator = this.getCreator();
+        final Object other$creator = other.getCreator();
+        if (this$creator == null ? other$creator != null : !this$creator.equals(other$creator)) return false;
+        final Object this$executor = this.getExecutor();
+        final Object other$executor = other.getExecutor();
+        if (this$executor == null ? other$executor != null : !this$executor.equals(other$executor)) return false;
+        final Object this$release = this.getRelease();
+        final Object other$release = other.getRelease();
+        if (this$release == null ? other$release != null : !this$release.equals(other$release)) return false;
+        final Object this$status = this.getStatus();
+        final Object other$status = other.getStatus();
+        if (this$status == null ? other$status != null : !this$status.equals(other$status)) return false;
+        if (this.getBorder() != other.getBorder()) return false;
+        return true;
+    }
+
+    protected boolean canEqual(final Object other) {
+        return other instanceof TaskResponseDto;
+    }
+
+    public int hashCode() {
+        final int PRIME = 59;
+        int result = 1;
+        final Object $id = this.getId();
+        result = result * PRIME + ($id == null ? 43 : $id.hashCode());
+        final Object $name = this.getName();
+        result = result * PRIME + ($name == null ? 43 : $name.hashCode());
+        final Object $description = this.getDescription();
+        result = result * PRIME + ($description == null ? 43 : $description.hashCode());
+        final Object $creator = this.getCreator();
+        result = result * PRIME + ($creator == null ? 43 : $creator.hashCode());
+        final Object $executor = this.getExecutor();
+        result = result * PRIME + ($executor == null ? 43 : $executor.hashCode());
+        final Object $release = this.getRelease();
+        result = result * PRIME + ($release == null ? 43 : $release.hashCode());
+        final Object $status = this.getStatus();
+        result = result * PRIME + ($status == null ? 43 : $status.hashCode());
+        result = result * PRIME + this.getBorder();
+        return result;
+    }
 }

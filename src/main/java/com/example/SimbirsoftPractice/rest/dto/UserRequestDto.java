@@ -2,7 +2,10 @@ package com.example.SimbirsoftPractice.rest.dto;
 
 import com.example.SimbirsoftPractice.rest.domain.Role;
 import io.swagger.v3.oas.annotations.media.Schema;
+
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Schema(description = "Данные о пользователе (from front to back)")
 public class UserRequestDto {
@@ -11,7 +14,7 @@ public class UserRequestDto {
     @Schema(description = "Пароль пользователя")
     private String password;
     @Schema(description = "Роли пользователя")
-    private List<Role> roles;
+    private Set<Role> roles = new HashSet<>();
 
     public String getName() {
         return name;
@@ -29,11 +32,11 @@ public class UserRequestDto {
         this.password = password;
     }
 
-    public List<Role> getRoles() {
+    public Set<Role> getRoles() {
         return roles;
     }
 
-    public void setRoles(List<Role> roles) {
+    public void setRoles(Set<Role> roles) {
         this.roles = roles;
     }
 }

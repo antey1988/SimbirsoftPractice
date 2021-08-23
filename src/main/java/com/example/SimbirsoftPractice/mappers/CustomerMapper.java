@@ -13,8 +13,7 @@ import java.util.List;
 public interface CustomerMapper {
     CustomerResponseDto entityToResponseDto(CustomerEntity customerEntity);
     List<CustomerResponseDto> listEntityToListResponseDto(List<CustomerEntity> listCustomerEntity);
-    CustomerEntity requestDtoToEntity(CustomerRequestDto customerRequestDto,
-                                              @MappingTarget CustomerEntity customerEntity);
-
+//    CustomerEntity requestDtoToEntity(CustomerRequestDto customerRequestDto,
+//                                              @MappingTarget CustomerEntity customerEntity);
     CustomerWithUUIDRequestDto entityToResponseDtoWithUUID(CustomerEntity customerEntity);
 }

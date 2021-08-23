@@ -14,6 +14,7 @@ import javax.persistence.ElementCollection;
 import javax.persistence.CollectionTable;
 import javax.persistence.JoinColumn;
 import javax.persistence.FetchType;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -33,7 +34,7 @@ public class UserEntity {
     @CollectionTable(name = "roles", joinColumns = @JoinColumn(name = "user_id"))
     @Column(name = "role")
     @Enumerated(EnumType.STRING)
-    private Set<Role> roles;
+    private Set<Role> roles = new HashSet<>();
 
     public Long getId() {
         return id;
