@@ -1,9 +1,9 @@
 package com.example.SimbirsoftPractice.mappers;
 
+import com.example.SimbirsoftPractice.configurations.MappersEntityAndResponseDtoConfig;
+import com.example.SimbirsoftPractice.configurations.MappersConfig;
 import com.example.SimbirsoftPractice.entities.UserEntity;
-import com.example.SimbirsoftPractice.rest.domain.Role;
 import com.example.SimbirsoftPractice.rest.dto.UserResponseDto;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,36 +11,19 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
-import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 
 @ExtendWith({SpringExtension.class})
-@ContextConfiguration(classes = UserMapperImpl.class)
+@ContextConfiguration(classes = {MappersConfig.class, MappersEntityAndResponseDtoConfig.class})
 class UserMapperImplTest {
-    private static UserEntity entity;
-    private static UserResponseDto response;
+    @Autowired
+    private UserEntity entity;
+    @Autowired
+    private UserResponseDto response;
     @Autowired
     private UserMapperImpl userMapper;
-
-    @BeforeAll
-    static void setUp() {
-        Long id = 1L;
-        String name = "User";
-        String password = "Password";
-        Set<Role> roles = Set.of(Role.ROLE_CRUD_USERS, Role.ROLE_CRUD_OTHERS);
-
-        entity = new UserEntity();
-        entity.setId(id);
-        entity.setName(name);
-        entity.setPassword(password);
-        entity.setRoles(roles);
-
-        response = new UserResponseDto();
-        response.setId(id);
-        response.setName(name);
-        response.setRoles(roles);
-    }
 
     @Test
     void entityToResponseDto() {

@@ -112,7 +112,7 @@ public class ProjectValidatorServiceImpl implements ProjectValidatorService {
         //если статус такой же, то завершаем проверку
         if (nValue != null && nValue != oValue) {
             //проверка на попытку перехода в статус с более низким рангом, что запрещено
-            if (nValue.ordinal() < oValue.ordinal()) {
+            if (oValue != null && nValue.ordinal() < oValue.ordinal()) {
                 String text = String.format("An attempt was made to save a project with an invalid status. " +
                                 "Transition from status %s to status %s prohibited", oValue, nValue);
                 logger.error(text);

@@ -66,7 +66,7 @@ public class UserValidatorServiceImpl implements UserValidatorService {
         }
         //update
         if (nValue != null) {
-            entity.setName(encoder.encode(nValue));
+            entity.setPassword(encoder.encode(nValue));
             logger.info("Field Password changed successfully");
         }
     }

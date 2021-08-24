@@ -1,11 +1,10 @@
 package com.example.SimbirsoftPractice.mappers;
 
+import com.example.SimbirsoftPractice.configurations.MappersEntityAndResponseDtoConfig;
+import com.example.SimbirsoftPractice.configurations.MappersConfig;
 import com.example.SimbirsoftPractice.entities.CustomerEntity;
-import com.example.SimbirsoftPractice.rest.dto.CustomerRequestDto;
 import com.example.SimbirsoftPractice.rest.dto.CustomerResponseDto;
 import com.example.SimbirsoftPractice.rest.dto.CustomerWithUUIDRequestDto;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,32 +12,18 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
-import java.util.UUID;
-import static org.junit.jupiter.api.Assertions.*;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith({SpringExtension.class})
-@ContextConfiguration(classes = CustomerMapperImpl.class)
+@ContextConfiguration(classes = {MappersConfig.class, MappersEntityAndResponseDtoConfig.class})
 class CustomerMapperImplTest {
-    private static CustomerEntity entity;
-    private static CustomerResponseDto response;
+    @Autowired
+    private CustomerEntity entity;
+    @Autowired
+    private CustomerResponseDto response;
     @Autowired
     private CustomerMapperImpl customerMapper;
-
-    @BeforeAll
-    static void setUp() {
-        Long id = 1L;
-        String name = "Customer";
-        UUID uuid = UUID.randomUUID();
-
-        entity = new CustomerEntity();
-        entity.setId(id);
-        entity.setName(name);
-        entity.setUuid(uuid);
-
-        response = new CustomerResponseDto();
-        response.setId(id);
-        response.setName(name);
-    }
 
     @Test
     void entityToResponseDto() {
