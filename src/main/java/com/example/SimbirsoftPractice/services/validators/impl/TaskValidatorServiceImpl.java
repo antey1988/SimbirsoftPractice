@@ -33,10 +33,10 @@ public class TaskValidatorServiceImpl implements TaskValidatorService {
         //other validation
         validateName(newValue, oldValue, locale);
         validateDescription(newValue, oldValue);
-        validateCreator(newValue, oldValue, locale);
         validateRelease(newValue, oldValue, locale);
-        validateStatus(newValue, oldValue, locale);
+        validateCreator(newValue, oldValue, locale);
         validateExecutor(newValue, oldValue, locale);
+        validateStatus(newValue, oldValue, locale);
         oldValue.setBorder(newValue.getBorder());
         //other validation
         return oldValue;
@@ -69,7 +69,7 @@ public class TaskValidatorServiceImpl implements TaskValidatorService {
         //если оно отличается от старого(в том числе null)
         //update
         if (nValue != null && !nValue.equals(oValue)) {
-            oldValue.setName(nValue);
+            oldValue.setDescription(nValue);
             logger.info("Field Description changed successfully");
         }
     }

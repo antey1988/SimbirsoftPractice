@@ -24,9 +24,8 @@ import java.util.Locale;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith({SpringExtension.class})
+@ExtendWith({SpringExtension.class,MockitoExtension.class})
 @ContextConfiguration(classes = MessageSourceConfig.class)
-@ExtendWith(MockitoExtension.class)
 class ProjectValidatorServiceImplTest {
     private Long id = 1L;
     private String name = "Name";

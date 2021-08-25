@@ -7,7 +7,6 @@ import com.example.SimbirsoftPractice.rest.dto.ReleaseRequestDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.test.context.ContextConfiguration;
@@ -20,7 +19,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = MessageSourceConfig.class)
-@ExtendWith(MockitoExtension.class)
 class ReleaseValidatorServiceImplTest {
     private Long project = 1L;
     private String name = "Name";

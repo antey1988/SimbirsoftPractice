@@ -16,7 +16,7 @@ import java.util.Locale;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@ExtendWith({SpringExtension.class})
+@ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = MessageSourceConfig.class)
 class CustomerValidatorServiceImplTest {
     private String name = "Name";

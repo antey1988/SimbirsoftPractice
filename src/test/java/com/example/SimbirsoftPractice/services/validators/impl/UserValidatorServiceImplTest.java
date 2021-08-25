@@ -22,8 +22,7 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith({SpringExtension.class})
-@ExtendWith({MockitoExtension.class})
+@ExtendWith({SpringExtension.class, MockitoExtension.class})
 @ContextConfiguration(classes = MessageSourceConfig.class)
 class UserValidatorServiceImplTest {
     private String name = "Name";
@@ -55,7 +54,7 @@ class UserValidatorServiceImplTest {
         assertAll(
                 () -> assertEquals(expected.getName(), actual.getName()),
                 () -> assertEquals(expected.getPassword(), actual.getPassword()),
-                () -> assertArrayEquals(expected.getRoles().toArray(new Role[0]), actual.getRoles().toArray(new Role[0]))
+                () -> assertEquals(expected.getRoles().size(), actual.getRoles().size())
         );
     }
 
