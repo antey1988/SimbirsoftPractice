@@ -1,6 +1,5 @@
 package com.example.SimbirsoftPractice.services.validators.impl;
 
-import com.example.SimbirsoftPractice.configurations.MessageSourceConfig;
 import com.example.SimbirsoftPractice.entities.ProjectEntity;
 import com.example.SimbirsoftPractice.repos.TaskRepository;
 import com.example.SimbirsoftPractice.rest.domain.StatusProject;
@@ -11,46 +10,40 @@ import com.example.SimbirsoftPractice.rest.dto.ProjectRequestDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.math.BigDecimal;
 import java.util.Locale;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith({SpringExtension.class,MockitoExtension.class})
-@ContextConfiguration(classes = MessageSourceConfig.class)
+@ExtendWith(MockitoExtension.class)
 class ProjectValidatorServiceImplTest {
-    private Long id = 1L;
-    private String name = "Name";
-    private String description = "Description";
-    private StatusProject statusProject = StatusProject.CREATED;
-    private BigDecimal price = new BigDecimal("10.00");
-    private Locale locale = Locale.ENGLISH;
-    ProjectRequestDto actual;
-    @Autowired
+    private final StatusProject statusProject = StatusProject.CREATED;
+    private final BigDecimal price = new BigDecimal("10.00");
+    private final Locale locale = Locale.ENGLISH;
+
+    private final ProjectRequestDto actual = new ProjectRequestDto();
+    @Mock
     private MessageSource messageSource;
     @Mock
     private TaskRepository taskRepository;
 
+    @InjectMocks
     private ProjectValidatorServiceImpl validatorService;
 
     @BeforeEach
     void setUp() {
-        actual = new ProjectRequestDto();
-        actual.setName(name);
-        actual.setDescription(description);
-        actual.setCustomer(id);
+        actual.setName("Name");
+        actual.setDescription("Description");
+        actual.setCustomer(1L);
         actual.setStatus(statusProject);
         actual.setPrice(price);
-
-        validatorService = new ProjectValidatorServiceImpl(taskRepository, messageSource);
+        Mockito.lenient().when(messageSource.getMessage(Mockito.anyString(), Mockito.isNull(), Mockito.any())).thenReturn("");
     }
 
     @Test

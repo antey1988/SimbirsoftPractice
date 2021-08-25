@@ -7,6 +7,10 @@ import com.example.SimbirsoftPractice.rest.dto.ReleaseRequestDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.test.context.ContextConfiguration;
@@ -17,29 +21,24 @@ import java.util.Locale;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = MessageSourceConfig.class)
+@ExtendWith(MockitoExtension.class)
 class ReleaseValidatorServiceImplTest {
-    private Long project = 1L;
-    private String name = "Name";
-    private Date start = new Date();
-    private Date stop = new Date();
-
-    private Locale locale = Locale.ENGLISH;
+    private final Locale locale = Locale.ENGLISH;
 
     ReleaseRequestDto actual = new ReleaseRequestDto();
-    @Autowired
+    @Mock
     private MessageSource messageSource;
 
+    @InjectMocks
     private ReleaseValidatorServiceImpl validatorService;
 
     @BeforeEach
     void setUp() {
-        actual.setName(name);
-        actual.setProject(project);
-        actual.setStartDate(start);
-        actual.setStopDate(stop);
-        validatorService = new ReleaseValidatorServiceImpl(messageSource);
+        actual.setName("Name");
+        actual.setProject(1L);
+        actual.setStartDate(new Date());
+        actual.setStopDate(new Date());
+        Mockito.lenient().when(messageSource.getMessage(Mockito.anyString(), Mockito.isNull(), Mockito.any())).thenReturn("");
     }
 
     @Test
@@ -55,28 +54,28 @@ class ReleaseValidatorServiceImplTest {
     }
 
     @Test
-    void validateName() {
+    void validateNullName() {
         actual.setName(null);
         assertThrows(NullValueFieldException.class,
                 () -> validatorService.validate(actual, new ReleaseEntity(), locale));
     }
 
     @Test
-    void validateProject() {
+    void validateNullProject() {
         actual.setProject(null);
         assertThrows(NullValueFieldException.class,
                 () -> validatorService.validate(actual, new ReleaseEntity(), locale));
     }
 
     @Test
-    void validateStartDate() {
+    void validateNullStartDate() {
         actual.setStartDate(null);
         assertThrows(NullValueFieldException.class,
                 () -> validatorService.validate(actual, new ReleaseEntity(), locale));
     }
 
     @Test
-    void validateStopDate() {
+    void validateNullStopDate() {
         actual.setStopDate(null);
         assertThrows(NullValueFieldException.class,
                 () -> validatorService.validate(actual, new ReleaseEntity(), locale));

@@ -1,6 +1,5 @@
 package com.example.SimbirsoftPractice.services.validators.impl;
 
-import com.example.SimbirsoftPractice.configurations.MessageSourceConfig;
 import com.example.SimbirsoftPractice.entities.ProjectEntity;
 import com.example.SimbirsoftPractice.entities.TaskEntity;
 import com.example.SimbirsoftPractice.repos.ProjectRepository;
@@ -12,70 +11,66 @@ import com.example.SimbirsoftPractice.rest.dto.TaskRequestDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Locale;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith({SpringExtension.class, MockitoExtension.class})
-@ContextConfiguration(classes = MessageSourceConfig.class)
+@ExtendWith(MockitoExtension.class)
 class TaskValidatorServiceImplTest {
-    private Locale locale = Locale.ENGLISH;
-    private Long id = 1L;
-    private String name = "Name";
-    private String description = "Description";
-    private StatusTask statusTask = StatusTask.IN_PROGRESS;
-    private int border = 0;
+    private final StatusTask statusTask = StatusTask.IN_PROGRESS;
+    private final Locale locale = Locale.ENGLISH;
 
-    private TaskRequestDto actual = new TaskRequestDto();
-
-    @Autowired
+    private final TaskRequestDto actual = new TaskRequestDto();
+    @Mock
     private MessageSource messageSource;
     @Mock
     private ProjectRepository projectRepository;
 
+    @InjectMocks
     private TaskValidatorServiceImpl validatorService;
 
     @BeforeEach
     void setUp() {
-        validatorService = new TaskValidatorServiceImpl(projectRepository, messageSource);
-
-        actual.setName(name);
-        actual.setDescription(description);
+        Long id = 1L;
+        actual.setName("Name");
+        actual.setDescription("Description");
         actual.setRelease(id);
         actual.setCreator(id);
         actual.setExecutor(id);
         actual.setStatus(statusTask);
-        actual.setBorder(border);
+        actual.setBorder(0);
     }
 
     @Test
     void validateNullName() {
+        Mockito.when(messageSource.getMessage(Mockito.anyString(), Mockito.isNull(), Mockito.any())).thenReturn("");
         actual.setName(null);
         assertThrows(NullValueFieldException.class, () -> validatorService.validate(actual, new TaskEntity(), locale));
     }
 
     @Test
     void validateNullRelease() {
+        Mockito.when(messageSource.getMessage(Mockito.anyString(), Mockito.isNull(), Mockito.any())).thenReturn("");
         actual.setRelease(null);
         assertThrows(NullValueFieldException.class, () -> validatorService.validate(actual, new TaskEntity(), locale));
     }
 
     @Test
     void validateNullCreator() {
+        Mockito.when(messageSource.getMessage(Mockito.anyString(), Mockito.isNull(), Mockito.any())).thenReturn("");
         actual.setCreator(null);
         assertThrows(NullValueFieldException.class, () -> validatorService.validate(actual, new TaskEntity(), locale));
     }
 
     @Test
     void validateNullExecutor() {
+        Mockito.when(messageSource.getMessage(Mockito.anyString(), Mockito.isNull(), Mockito.any())).thenReturn("");
         actual.setExecutor(null);
         assertThrows(NullValueFieldException.class, () -> validatorService.validate(actual, new TaskEntity(), locale));
     }
