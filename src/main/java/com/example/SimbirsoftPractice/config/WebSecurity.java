@@ -1,5 +1,6 @@
 package com.example.SimbirsoftPractice.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -14,11 +15,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Configuration
 @EnableWebSecurity
 public class WebSecurity extends WebSecurityConfigurerAdapter {
+    @Autowired
     private UserDetailsService userDetailsService;
 
-    public WebSecurity(UserDetailsService userDetailsService) {
-        this.userDetailsService = userDetailsService;
-    }
+//    public WebSecurity(UserDetailsService userDetailsService) {
+//        this.userDetailsService = userDetailsService;
+//    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
