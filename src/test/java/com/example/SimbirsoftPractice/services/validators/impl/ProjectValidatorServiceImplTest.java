@@ -1,5 +1,6 @@
 package com.example.SimbirsoftPractice.services.validators.impl;
 
+import com.example.SimbirsoftPractice.configurations.UtilProjects;
 import com.example.SimbirsoftPractice.entities.ProjectEntity;
 import com.example.SimbirsoftPractice.repos.TaskRepository;
 import com.example.SimbirsoftPractice.rest.domain.StatusProject;
@@ -23,11 +24,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 class ProjectValidatorServiceImplTest {
-    private final StatusProject statusProject = StatusProject.CREATED;
-    private final BigDecimal price = new BigDecimal("10.00");
     private final Locale locale = Locale.ENGLISH;
 
-    private final ProjectRequestDto actual = new ProjectRequestDto();
+    private  ProjectRequestDto actual;
     @Mock
     private MessageSource messageSource;
     @Mock
@@ -38,11 +37,7 @@ class ProjectValidatorServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        actual.setName("Name");
-        actual.setDescription("Description");
-        actual.setCustomer(1L);
-        actual.setStatus(statusProject);
-        actual.setPrice(price);
+        actual = UtilProjects.defaultRequest();
         Mockito.lenient().when(messageSource.getMessage(Mockito.anyString(), Mockito.isNull(), Mockito.any())).thenReturn("");
     }
 
@@ -65,7 +60,7 @@ class ProjectValidatorServiceImplTest {
         ProjectEntity expected = validatorService.validate(actual, new ProjectEntity(), locale);
         assertAll(
                 () -> assertEquals(expected.getPrice(), new BigDecimal("0.00")),
-                () -> assertEquals(expected.getStatus(), statusProject)
+                () -> assertEquals(expected.getStatus(), actual.getStatus())
         );
     }
 

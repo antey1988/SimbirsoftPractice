@@ -1,30 +1,20 @@
 package com.example.SimbirsoftPractice.mappers;
 
-import com.example.SimbirsoftPractice.configurations.MappersEntityAndResponseDtoConfig;
-import com.example.SimbirsoftPractice.configurations.MappersConfig;
+import com.example.SimbirsoftPractice.configurations.UtilTasks;
 import com.example.SimbirsoftPractice.entities.TaskEntity;
 import com.example.SimbirsoftPractice.rest.dto.TaskResponseDto;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 
-
-@ExtendWith({SpringExtension.class})
-@ContextConfiguration(classes = {MappersConfig.class, MappersEntityAndResponseDtoConfig.class})
 class TaskMapperImplTest {
-    @Autowired
-    private TaskEntity entity;
-    @Autowired
-    private TaskResponseDto response;
-    @Autowired
-    private TaskMapperImpl taskMapper;
+    private final TaskEntity entity = UtilTasks.defaultEntity();
+    private final TaskResponseDto response = UtilTasks.defaultResponse();
+
+    private TaskMapperImpl taskMapper = new TaskMapperImpl();
 
     @Test
     void entityToResponseDto() {

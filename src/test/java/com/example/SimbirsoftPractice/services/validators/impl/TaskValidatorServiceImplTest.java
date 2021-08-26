@@ -1,5 +1,6 @@
 package com.example.SimbirsoftPractice.services.validators.impl;
 
+import com.example.SimbirsoftPractice.configurations.UtilTasks;
 import com.example.SimbirsoftPractice.entities.ProjectEntity;
 import com.example.SimbirsoftPractice.entities.TaskEntity;
 import com.example.SimbirsoftPractice.repos.ProjectRepository;
@@ -23,10 +24,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 class TaskValidatorServiceImplTest {
-    private final StatusTask statusTask = StatusTask.IN_PROGRESS;
     private final Locale locale = Locale.ENGLISH;
 
-    private final TaskRequestDto actual = new TaskRequestDto();
+    private TaskRequestDto actual;
     @Mock
     private MessageSource messageSource;
     @Mock
@@ -37,14 +37,7 @@ class TaskValidatorServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        Long id = 1L;
-        actual.setName("Name");
-        actual.setDescription("Description");
-        actual.setRelease(id);
-        actual.setCreator(id);
-        actual.setExecutor(id);
-        actual.setStatus(statusTask);
-        actual.setBorder(0);
+        actual = UtilTasks.defaultRequest();
     }
 
     @Test

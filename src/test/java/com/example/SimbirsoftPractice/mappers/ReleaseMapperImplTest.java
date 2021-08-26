@@ -1,28 +1,20 @@
 package com.example.SimbirsoftPractice.mappers;
 
-import com.example.SimbirsoftPractice.configurations.MappersEntityAndResponseDtoConfig;
-import com.example.SimbirsoftPractice.configurations.MappersConfig;
+import com.example.SimbirsoftPractice.configurations.UtilReleases;
 import com.example.SimbirsoftPractice.entities.ReleaseEntity;
 import com.example.SimbirsoftPractice.rest.dto.ReleaseResponseDto;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 
-@ExtendWith({SpringExtension.class})
-@ContextConfiguration(classes = {MappersConfig.class, MappersEntityAndResponseDtoConfig.class})
 class ReleaseMapperImplTest {
-    @Autowired
-    private ReleaseEntity entity;
-    @Autowired
-    private ReleaseResponseDto response;
-    @Autowired
-    private ReleaseMapperImpl releaseMapper;
+    private final ReleaseEntity entity = UtilReleases.defaultEntity();
+    private final ReleaseResponseDto response = UtilReleases.defaultResponse();
+
+    private ReleaseMapperImpl releaseMapper = new ReleaseMapperImpl();
 
     @Test
     void entityToResponseDto() {

@@ -1,7 +1,7 @@
 package com.example.SimbirsoftPractice.services.validators.impl;
 
+import com.example.SimbirsoftPractice.configurations.UtilUsers;
 import com.example.SimbirsoftPractice.entities.UserEntity;
-import com.example.SimbirsoftPractice.rest.domain.Role;
 import com.example.SimbirsoftPractice.rest.domain.exceptions.NullValueFieldException;
 import com.example.SimbirsoftPractice.rest.dto.UserRequestDto;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,16 +15,14 @@ import org.springframework.context.MessageSource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Locale;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 class UserValidatorServiceImplTest {
-    private final String password = "Password";
     private final Locale locale = Locale.ENGLISH;
 
-    private final UserRequestDto actual = new UserRequestDto();
+    private UserRequestDto actual;
     @Mock
     private PasswordEncoder passwordEncoder;
     @Mock
@@ -35,15 +33,13 @@ class UserValidatorServiceImplTest {
 
     @BeforeEach
     public void setUp() {
-        actual.setName("Name");
-        actual.setPassword(password);
-        actual.setRoles(Set.of(Role.ROLE_CRUD_USERS, Role.ROLE_CRUD_OTHERS));
+        actual = UtilUsers.defaultRequest();
     }
 
 
     @Test
     void validateNotNull() {
-        Mockito.when(passwordEncoder.encode(password)).thenReturn(password);
+        Mockito.when(passwordEncoder.encode(actual.getPassword())).thenReturn(actual.getPassword());
         UserEntity expected = validatorService.validate(actual, new UserEntity(), locale);
         assertAll(
                 () -> assertEquals(expected.getName(), actual.getName()),

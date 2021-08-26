@@ -1,5 +1,6 @@
 package com.example.SimbirsoftPractice.services.validators.impl;
 
+import com.example.SimbirsoftPractice.configurations.UtilReleases;
 import com.example.SimbirsoftPractice.entities.ReleaseEntity;
 import com.example.SimbirsoftPractice.rest.domain.exceptions.IllegalDateException;
 import com.example.SimbirsoftPractice.rest.domain.exceptions.NullValueFieldException;
@@ -22,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class ReleaseValidatorServiceImplTest {
     private final Locale locale = Locale.ENGLISH;
 
-    ReleaseRequestDto actual = new ReleaseRequestDto();
+    ReleaseRequestDto actual;
     @Mock
     private MessageSource messageSource;
 
@@ -31,10 +32,7 @@ class ReleaseValidatorServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        actual.setName("Name");
-        actual.setProject(1L);
-        actual.setStartDate(new Date());
-        actual.setStopDate(new Date());
+        actual = UtilReleases.defaultRequest();
         Mockito.lenient().when(messageSource.getMessage(Mockito.anyString(), Mockito.isNull(), Mockito.any())).thenReturn("");
     }
 
