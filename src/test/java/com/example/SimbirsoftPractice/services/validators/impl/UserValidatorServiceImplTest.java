@@ -55,7 +55,7 @@ class UserValidatorServiceImplTest {
     @Test
     void validateNullName() {
         actual.setName(null);
-//        Mockito.when(messageSource.getMessage(Mockito.anyString(), Mockito.isNull(), Mockito.any())).thenReturn("");
+        Mockito.when(messageSource.getMessage(Mockito.anyString(), Mockito.isNull(), Mockito.any())).thenReturn("");
         assertThrows(NullValueFieldException.class, () -> validatorService.validate(actual, new UserEntity(), locale));
     }
 

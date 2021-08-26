@@ -3,6 +3,7 @@ package com.example.SimbirsoftPractice.rest.controllers;
 import com.example.SimbirsoftPractice.feign.NotAvailablePaymentServiceException;
 import com.example.SimbirsoftPractice.rest.controllers.exceptions.NotEnoughMoneyException;
 import com.example.SimbirsoftPractice.rest.controllers.exceptions.NotFoundException;
+import com.example.SimbirsoftPractice.rest.domain.exceptions.IllegalDateException;
 import com.example.SimbirsoftPractice.rest.domain.exceptions.IllegalStatusException;
 import com.example.SimbirsoftPractice.rest.domain.exceptions.NullValueFieldException;
 import com.example.SimbirsoftPractice.rest.domain.exceptions.NullValueObjectException;
@@ -26,7 +27,8 @@ public class ErrorController {
         return ResponseEntity.status(HttpStatus.PAYMENT_REQUIRED).body(e.getMessage());
     }
 
-    @ExceptionHandler({IllegalStatusException.class, NullValueFieldException.class, NullValueObjectException.class})
+    @ExceptionHandler({IllegalStatusException.class, NullValueFieldException.class,
+            NullValueObjectException.class, IllegalDateException.class})
     public ResponseEntity<String> handleIllegalStateStatusException(RuntimeException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }

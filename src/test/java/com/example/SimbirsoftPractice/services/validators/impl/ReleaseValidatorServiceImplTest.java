@@ -1,7 +1,7 @@
 package com.example.SimbirsoftPractice.services.validators.impl;
 
-import com.example.SimbirsoftPractice.configurations.MessageSourceConfig;
 import com.example.SimbirsoftPractice.entities.ReleaseEntity;
+import com.example.SimbirsoftPractice.rest.domain.exceptions.IllegalDateException;
 import com.example.SimbirsoftPractice.rest.domain.exceptions.NullValueFieldException;
 import com.example.SimbirsoftPractice.rest.dto.ReleaseRequestDto;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,10 +11,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Date;
 import java.util.Locale;
@@ -78,6 +75,13 @@ class ReleaseValidatorServiceImplTest {
     void validateNullStopDate() {
         actual.setStopDate(null);
         assertThrows(NullValueFieldException.class,
+                () -> validatorService.validate(actual, new ReleaseEntity(), locale));
+    }
+
+    @Test
+    void validateStartAndStopDate() {
+        actual.setStopDate(new Date(actual.getStartDate().getTime() - 1));
+        assertThrows(IllegalDateException.class,
                 () -> validatorService.validate(actual, new ReleaseEntity(), locale));
     }
 }

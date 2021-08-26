@@ -2,6 +2,7 @@ package com.example.SimbirsoftPractice.services.validators.impl;
 
 import com.example.SimbirsoftPractice.entities.ProjectEntity;
 import com.example.SimbirsoftPractice.entities.ReleaseEntity;
+import com.example.SimbirsoftPractice.rest.domain.exceptions.IllegalDateException;
 import com.example.SimbirsoftPractice.rest.domain.exceptions.NullValueFieldException;
 import com.example.SimbirsoftPractice.rest.dto.ReleaseRequestDto;
 import com.example.SimbirsoftPractice.services.validators.ReleaseValidatorService;
@@ -28,7 +29,7 @@ public class ReleaseValidatorServiceImpl implements ReleaseValidatorService {
     public ReleaseEntity validate(ReleaseRequestDto dto, ReleaseEntity entity, Locale locale) {
         validateName(dto, entity, locale);
         validateProject(dto, entity, locale);
-        validateDates(dto, entity);
+        validateDates(dto, entity, locale);
         return entity;
     }
 
@@ -73,26 +74,47 @@ public class ReleaseValidatorServiceImpl implements ReleaseValidatorService {
         }
     }
 
-    private void validateDates(ReleaseRequestDto newValue, ReleaseEntity oldValue) {
+    private void validateDates(ReleaseRequestDto newValue, ReleaseEntity oldValue, Locale locale) {
+        Date start, stop;
         //StartDate
         Date oValue = oldValue.getStartDate();
         Date nValue = newValue.getStartDate();
-        //при создании и обновлении записи поле измениться на новое значение,
-        //если оно отличается от старого(в том числе null)
-        //update
-        if (nValue != null && !nValue.equals(oValue)) {
-            oldValue.setStartDate(nValue);
-            logger.info("Field StartDate changed successfully");
+        if (nValue == null && oValue == null) {
+            String error = messageSource.getMessage("error.NullValueField", null, locale);
+            String field = messageSource.getMessage("field.startDate", null, locale);
+            logger.error("Attempting to save a release with an empty field StartDate. Denied");
+            throw new NullValueFieldException(String.format(error, field));
         }
+        //в переменную заносим актуальное значение
+        if (nValue != null && !nValue.equals(oValue)) {
+            start = nValue;
+        } else {
+            start = oValue;
+        }
+
         //StopDate
         oValue = oldValue.getStopDate();
         nValue = newValue.getStopDate();
-        //при создании и обновлении записи поле измениться на новое значение,
-        //если оно отличается от старого(в том числе null)
-        //update
-        if (nValue != null && !nValue.equals(oValue)) {
-            oldValue.setStopDate(nValue);
-            logger.info("Field StopDate changed successfully");
+        if (nValue == null && oValue == null) {
+            String error = messageSource.getMessage("error.NullValueField", null, locale);
+            String field = messageSource.getMessage("field.stopDate", null, locale);
+            logger.error("Attempting to save a release with an empty field StopDate. Denied");
+            throw new NullValueFieldException(String.format(error, field));
         }
+        //в переменную заносим актуальное значение
+        if (nValue != null && !nValue.equals(oValue)) {
+            stop = nValue;
+        } else {
+            stop = oValue;
+        }
+        //проверка на корректность введенных данных
+        if (stop.before(start)) {
+            logger.error("Attempting to save a release where the StopDate is earlier than the StartDate. Denied");
+            throw new IllegalDateException(messageSource.getMessage("error.IllegalData", null, locale));
+        }
+        oldValue.setStartDate(start);
+        logger.info("Field StartDate changed successfully");
+        oldValue.setStopDate(stop);
+        logger.info("Field StopDate changed successfully");
     }
 }
