@@ -1,4 +1,4 @@
-package com.example.SimbirsoftPractice.configurations;
+package com.example.SimbirsoftPractice.utils;
 
 import com.example.SimbirsoftPractice.entities.CustomerEntity;
 import com.example.SimbirsoftPractice.entities.ProjectEntity;
@@ -36,7 +36,7 @@ public class UtilProjects {
         return new UtilProjects.ProjectBuilder();
     }
 
-    private static class ProjectBuilder {
+    public static class ProjectBuilder {
         private Long id;
         private String name;
         private String description;
@@ -45,6 +45,9 @@ public class UtilProjects {
         private Date start;
         private Date stop;
         private BigDecimal price;
+
+        private ProjectBuilder() {
+        }
 
         public UtilProjects.ProjectBuilder id(Long id) {
             this.id = id;

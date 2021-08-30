@@ -1,6 +1,6 @@
 package com.example.SimbirsoftPractice.services.validators.impl;
 
-import com.example.SimbirsoftPractice.configurations.UtilCustomers;
+import com.example.SimbirsoftPractice.utils.UtilCustomers;
 import com.example.SimbirsoftPractice.entities.CustomerEntity;
 import com.example.SimbirsoftPractice.rest.domain.exceptions.NullValueFieldException;
 import com.example.SimbirsoftPractice.rest.dto.CustomerRequestDto;
@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class CustomerValidatorServiceImplTest {
     private final Locale locale = Locale.ENGLISH;
 
-    private final CustomerRequestDto actual = UtilCustomers.defaultRequest();
+    private final CustomerRequestDto expected = UtilCustomers.defaultRequest();
     @Mock
     private MessageSource messageSource;
 
@@ -30,7 +30,7 @@ class CustomerValidatorServiceImplTest {
 
     @Test
     void validateNotNull() {
-        CustomerEntity expected = validatorService.validate(actual, new CustomerEntity(), locale);
+        CustomerEntity actual = validatorService.validate(expected, new CustomerEntity(), locale);
         assertEquals(expected.getName(), actual.getName());
     }
 

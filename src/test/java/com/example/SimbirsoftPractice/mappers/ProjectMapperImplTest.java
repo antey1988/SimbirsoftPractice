@@ -1,6 +1,6 @@
 package com.example.SimbirsoftPractice.mappers;
 
-import com.example.SimbirsoftPractice.configurations.UtilProjects;
+import com.example.SimbirsoftPractice.utils.UtilProjects;
 import com.example.SimbirsoftPractice.entities.ProjectEntity;
 import com.example.SimbirsoftPractice.rest.dto.PaymentProjectRequestDto;
 import com.example.SimbirsoftPractice.rest.dto.ProjectResponseDto;
@@ -20,23 +20,23 @@ class ProjectMapperImplTest {
 
     @Test
     void entityToResponseDto() {
-        ProjectResponseDto actual = response;
-        ProjectResponseDto expected = projectMapper.entityToResponseDto(entity);
+        ProjectResponseDto expected = response;
+        ProjectResponseDto actual = projectMapper.entityToResponseDto(entity);
         assertEquals(expected, actual);
     }
 
     @Test
     void listEntityToListResponseDto() {
-        List<ProjectResponseDto> actual = List.of(response, response, response);
-        List<ProjectResponseDto> expected = projectMapper.listEntityToListResponseDto(List.of(entity, entity, entity));
+        List<ProjectResponseDto> expected = List.of(response, response, response);
+        List<ProjectResponseDto> actual = projectMapper.listEntityToListResponseDto(List.of(entity, entity, entity));
         assertEquals(expected.size(), actual.size());
         assertIterableEquals(expected, actual);
     }
 
     @Test
     void entityToPaymentProjectRequestDto() {
-        PaymentProjectRequestDto actual = payment;
-        PaymentProjectRequestDto expected = projectMapper.entityToPaymentProjectRequestDto(entity);
+        PaymentProjectRequestDto expected = payment;
+        PaymentProjectRequestDto actual = projectMapper.entityToPaymentProjectRequestDto(entity);
         assertEquals(expected, actual);
     }
 }

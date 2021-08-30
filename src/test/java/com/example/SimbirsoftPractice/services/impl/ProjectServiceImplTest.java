@@ -96,15 +96,15 @@ class ProjectServiceImplTest {
 
         Mockito.when(repository.findAll()).thenReturn(list);
 
-        List<ProjectResponseDto> response = projectService.readListProjects(null);
-        assertNotNull(response);
-        assertEquals(response.size(), 2);
+        List<ProjectResponseDto> actual = projectService.readListProjects(null);
+        assertNotNull(actual);
+        assertEquals(actual.size(), 2);
 
 
         Mockito.when(repository.findByCustomerId(id_1)).thenReturn(list);
 
-        response = projectService.readListProjects(id_1);
-        assertNotNull(response);
-        assertEquals(response.size(), 2);
+        actual = projectService.readListProjects(id_1);
+        assertNotNull(actual);
+        assertEquals(actual.size(), 2);
     }
 }

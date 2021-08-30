@@ -1,11 +1,11 @@
 package com.example.SimbirsoftPractice.services.validators.impl;
 
-import com.example.SimbirsoftPractice.configurations.UtilTasks;
+import com.example.SimbirsoftPractice.utils.UtilProjects;
+import com.example.SimbirsoftPractice.utils.UtilTasks;
 import com.example.SimbirsoftPractice.entities.ProjectEntity;
 import com.example.SimbirsoftPractice.entities.TaskEntity;
 import com.example.SimbirsoftPractice.repos.ProjectRepository;
 import com.example.SimbirsoftPractice.rest.domain.StatusProject;
-import com.example.SimbirsoftPractice.rest.domain.StatusTask;
 import com.example.SimbirsoftPractice.rest.domain.exceptions.IllegalStatusException;
 import com.example.SimbirsoftPractice.rest.domain.exceptions.NullValueFieldException;
 import com.example.SimbirsoftPractice.rest.dto.TaskRequestDto;
@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class TaskValidatorServiceImplTest {
     private final Locale locale = Locale.ENGLISH;
 
-    private TaskRequestDto actual;
+    private TaskRequestDto expected;
     @Mock
     private MessageSource messageSource;
     @Mock
@@ -37,81 +37,75 @@ class TaskValidatorServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        actual = UtilTasks.defaultRequest();
+        expected = UtilTasks.defaultRequest();
     }
 
     @Test
     void validateNullName() {
         Mockito.when(messageSource.getMessage(Mockito.anyString(), Mockito.isNull(), Mockito.any())).thenReturn("");
-        actual.setName(null);
-        assertThrows(NullValueFieldException.class, () -> validatorService.validate(actual, new TaskEntity(), locale));
+        expected.setName(null);
+        assertThrows(NullValueFieldException.class, () -> validatorService.validate(expected, new TaskEntity(), locale));
     }
 
     @Test
     void validateNullRelease() {
         Mockito.when(messageSource.getMessage(Mockito.anyString(), Mockito.isNull(), Mockito.any())).thenReturn("");
-        actual.setRelease(null);
-        assertThrows(NullValueFieldException.class, () -> validatorService.validate(actual, new TaskEntity(), locale));
+        expected.setRelease(null);
+        assertThrows(NullValueFieldException.class, () -> validatorService.validate(expected, new TaskEntity(), locale));
     }
 
     @Test
     void validateNullCreator() {
         Mockito.when(messageSource.getMessage(Mockito.anyString(), Mockito.isNull(), Mockito.any())).thenReturn("");
-        actual.setCreator(null);
-        assertThrows(NullValueFieldException.class, () -> validatorService.validate(actual, new TaskEntity(), locale));
+        expected.setCreator(null);
+        assertThrows(NullValueFieldException.class, () -> validatorService.validate(expected, new TaskEntity(), locale));
     }
 
     @Test
     void validateNullExecutor() {
         Mockito.when(messageSource.getMessage(Mockito.anyString(), Mockito.isNull(), Mockito.any())).thenReturn("");
-        actual.setExecutor(null);
-        assertThrows(NullValueFieldException.class, () -> validatorService.validate(actual, new TaskEntity(), locale));
+        expected.setExecutor(null);
+        assertThrows(NullValueFieldException.class, () -> validatorService.validate(expected, new TaskEntity(), locale));
     }
 
     @Test
     void validateDefaultValueStatus() {
-        ProjectEntity project = new ProjectEntity();
-        project.setStatus(StatusProject.CREATED);
-        actual.setStatus(null);
-        Mockito.when(projectRepository.getProjectByRelease(actual.getRelease())).thenReturn(project);
-        TaskEntity expected = validatorService.validate(actual, new TaskEntity(), locale);
+        expected.setStatus(null);
+        Mockito.when(projectRepository.getProjectByRelease(expected.getRelease())).thenReturn(UtilProjects.defaultEntity());
+        TaskEntity actual = validatorService.validate(expected, new TaskEntity(), locale);
         assertEquals(expected.getStatus(), actual.getStatus());
     }
 
     @Test
     void validateCreationWithClosedProject() {
-        ProjectEntity project = new ProjectEntity();
-        project.setStatus(StatusProject.CLOSED);
-        Mockito.when(projectRepository.getProjectByRelease(actual.getRelease())).thenReturn(project);
-        assertThrows(IllegalStatusException.class, () -> validatorService.validate(actual, new TaskEntity(), locale));
+        ProjectEntity project = UtilProjects.builder().status(StatusProject.CLOSED).buildEntity();
+        Mockito.when(projectRepository.getProjectByRelease(expected.getRelease())).thenReturn(project);
+        assertThrows(IllegalStatusException.class, () -> validatorService.validate(expected, new TaskEntity(), locale));
 
     }
 
     @Test
     void validateUpdateWithNotOpenProject() {
-        ProjectEntity project = new ProjectEntity();
-        project.setStatus(StatusProject.CREATED);
-        Mockito.when(projectRepository.getProjectByRelease(actual.getRelease())).thenReturn(project);
-        assertThrows(IllegalStatusException.class, () -> validatorService.validate(actual, new TaskEntity(), locale));
+        Mockito.when(projectRepository.getProjectByRelease(expected.getRelease())).thenReturn(UtilProjects.defaultEntity());
+        assertThrows(IllegalStatusException.class, () -> validatorService.validate(expected, new TaskEntity(), locale));
 
     }
 
     @Test
     void validateNotNull() {
-        ProjectEntity project = new ProjectEntity();
-        project.setStatus(StatusProject.OPEN);
-        Mockito.when(projectRepository.getProjectByRelease(actual.getRelease())).thenReturn(project);
-        TaskEntity expected = validatorService.validate(actual, new TaskEntity(), locale);
+        ProjectEntity project = UtilProjects.builder().status(StatusProject.OPEN).buildEntity();
+        Mockito.when(projectRepository.getProjectByRelease(expected.getRelease())).thenReturn(project);
+        TaskEntity actual = validatorService.validate(expected, new TaskEntity(), locale);
         assertAll(
                 () -> assertEquals(expected.getName(), actual.getName()),
                 () -> assertEquals(expected.getDescription(), actual.getDescription()),
                 () -> assertEquals(expected.getStatus(), actual.getStatus()),
                 () -> assertNotNull(expected.getRelease()),
-                () -> assertEquals(expected.getRelease().getId(), actual.getRelease()),
+                () -> assertEquals(expected.getRelease(), actual.getRelease().getId()),
                 () -> assertNotNull(expected.getCreator()),
-                () -> assertEquals(expected.getCreator().getId(), actual.getCreator()),
+                () -> assertEquals(expected.getCreator(), actual.getCreator().getId()),
                 () -> assertNotNull(expected.getRelease()),
-                () -> assertEquals(expected.getExecutor().getId(), actual.getExecutor()),
+                () -> assertEquals(expected.getExecutor(), actual.getExecutor().getId()),
                 () -> assertEquals(expected.getBorder(), actual.getBorder())
         );
     }

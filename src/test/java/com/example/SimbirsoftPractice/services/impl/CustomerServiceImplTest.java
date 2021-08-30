@@ -92,8 +92,8 @@ class CustomerServiceImplTest {
         Mockito.when(repository.findAll()).thenReturn(list);
         Mockito.when(mapper.listEntityToListResponseDto(list))
                 .thenReturn(List.of(new CustomerResponseDto(), new CustomerResponseDto()));
-        List<CustomerResponseDto> response = customerService.getListCustomers();
-        assertNotNull(response);
-        assertEquals(response.size(), 2);
+        List<CustomerResponseDto> actual = customerService.getListCustomers();
+        assertNotNull(actual);
+        assertEquals(actual.size(), 2);
     }
 }

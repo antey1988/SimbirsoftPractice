@@ -103,9 +103,9 @@ class TaskServiceImplTest {
         Mockito.when(mapper.listEntityToListResponseDto(list))
                 .thenReturn(List.of(new TaskResponseDto(), new TaskResponseDto()));
 
-        List<TaskResponseDto> response = taskService.readListTasksByCreatorId(id_1);
-        assertNotNull(response);
-        assertEquals(response.size(), 2);
+        List<TaskResponseDto> actual = taskService.readListTasksByCreatorId(id_1);
+        assertNotNull(actual);
+        assertEquals(actual.size(), 2);
     }
 
     @Test

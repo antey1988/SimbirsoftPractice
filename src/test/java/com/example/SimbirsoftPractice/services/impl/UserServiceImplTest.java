@@ -81,8 +81,8 @@ class UserServiceImplTest {
         Mockito.when(repository.findAll()).thenReturn(list);
         Mockito.when(mapper.listEntityToListResponseDto(list))
                 .thenReturn(List.of(new UserResponseDto(), new UserResponseDto()));
-        List<UserResponseDto> response = userService.getListUsers();
-        assertNotNull(response);
-        assertEquals(response.size(), 2);
+        List<UserResponseDto> actual = userService.getListUsers();
+        assertNotNull(actual);
+        assertEquals(actual.size(), 2);
     }
 }

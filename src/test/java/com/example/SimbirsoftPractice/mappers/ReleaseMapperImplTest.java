@@ -1,6 +1,6 @@
 package com.example.SimbirsoftPractice.mappers;
 
-import com.example.SimbirsoftPractice.configurations.UtilReleases;
+import com.example.SimbirsoftPractice.utils.UtilReleases;
 import com.example.SimbirsoftPractice.entities.ReleaseEntity;
 import com.example.SimbirsoftPractice.rest.dto.ReleaseResponseDto;
 import org.junit.jupiter.api.Test;
@@ -18,15 +18,15 @@ class ReleaseMapperImplTest {
 
     @Test
     void entityToResponseDto() {
-        ReleaseResponseDto actual = response;
-        ReleaseResponseDto expected = releaseMapper.entityToResponseDto(entity);
+        ReleaseResponseDto expected = response;
+        ReleaseResponseDto actual = releaseMapper.entityToResponseDto(entity);
         assertEquals(expected, actual);
     }
 
     @Test
     void listEntityToListResponseDto() {
-        List<ReleaseResponseDto> actual = List.of(response, response, response);
-        List<ReleaseResponseDto> expected = releaseMapper.listEntityToListResponseDto(List.of(entity, entity, entity));
+        List<ReleaseResponseDto> expected = List.of(response, response, response);
+        List<ReleaseResponseDto> actual = releaseMapper.listEntityToListResponseDto(List.of(entity, entity, entity));
         assertEquals(expected.size(), actual.size());
         assertIterableEquals(expected, actual);
     }

@@ -1,15 +1,8 @@
-package com.example.SimbirsoftPractice.configurations;
+package com.example.SimbirsoftPractice.utils;
 
 import com.example.SimbirsoftPractice.entities.*;
-import com.example.SimbirsoftPractice.rest.domain.Role;
-import com.example.SimbirsoftPractice.rest.domain.StatusProject;
 import com.example.SimbirsoftPractice.rest.domain.StatusTask;
 import com.example.SimbirsoftPractice.rest.dto.*;
-
-import java.math.BigDecimal;
-import java.util.Date;
-import java.util.Set;
-import java.util.UUID;
 
 public class UtilTasks {
     private static UtilTasks.TaskBuilder defaultTask = builder()

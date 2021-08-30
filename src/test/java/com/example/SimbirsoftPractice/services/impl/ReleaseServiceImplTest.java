@@ -88,8 +88,8 @@ class ReleaseServiceImplTest {
         Mockito.when(mapper.listEntityToListResponseDto(list))
                 .thenReturn(List.of(new ReleaseResponseDto(), new ReleaseResponseDto()));
 
-        List<ReleaseResponseDto> response = releaseService.readListReleaseByProjectId(id_1);
-        assertNotNull(response);
-        assertEquals(response.size(), 2);
+        List<ReleaseResponseDto> actual = releaseService.readListReleaseByProjectId(id_1);
+        assertNotNull(actual);
+        assertEquals(actual.size(), 2);
     }
 }

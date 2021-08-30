@@ -1,6 +1,6 @@
 package com.example.SimbirsoftPractice.mappers;
 
-import com.example.SimbirsoftPractice.configurations.UtilUsers;
+import com.example.SimbirsoftPractice.utils.UtilUsers;
 import com.example.SimbirsoftPractice.entities.UserEntity;
 import com.example.SimbirsoftPractice.rest.domain.Role;
 import com.example.SimbirsoftPractice.rest.dto.UserResponseDto;
@@ -20,8 +20,8 @@ class UserMapperImplTest {
 
     @Test
     void entityToResponseDto() {
-        UserResponseDto actual = response;
-        UserResponseDto expected = userMapper.entityToResponseDto(entity);
+        UserResponseDto expected = response;
+        UserResponseDto actual = userMapper.entityToResponseDto(entity);
         assertEquals(expected.getId(), actual.getId());
         assertEquals(expected.getName(), actual.getName());
         Collection<Role> exp = expected.getRoles();
@@ -32,8 +32,8 @@ class UserMapperImplTest {
 
     @Test
     void listEntityToListResponseDto() {
-        List<UserResponseDto> actual = List.of(response, response);
-        List<UserResponseDto> expected = userMapper.listEntityToListResponseDto(List.of(entity, entity));
+        List<UserResponseDto> expected = List.of(response, response);
+        List<UserResponseDto> actual = userMapper.listEntityToListResponseDto(List.of(entity, entity));
         assertEquals(expected.size(), actual.size());
     }
 }

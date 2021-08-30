@@ -1,6 +1,6 @@
 package com.example.SimbirsoftPractice.services.validators.impl;
 
-import com.example.SimbirsoftPractice.configurations.UtilReleases;
+import com.example.SimbirsoftPractice.utils.UtilReleases;
 import com.example.SimbirsoftPractice.entities.ReleaseEntity;
 import com.example.SimbirsoftPractice.rest.domain.exceptions.IllegalDateException;
 import com.example.SimbirsoftPractice.rest.domain.exceptions.NullValueFieldException;
@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class ReleaseValidatorServiceImplTest {
     private final Locale locale = Locale.ENGLISH;
 
-    ReleaseRequestDto actual;
+    ReleaseRequestDto expected;
     @Mock
     private MessageSource messageSource;
 
@@ -32,17 +32,17 @@ class ReleaseValidatorServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        actual = UtilReleases.defaultRequest();
+        expected = UtilReleases.defaultRequest();
         Mockito.lenient().when(messageSource.getMessage(Mockito.anyString(), Mockito.isNull(), Mockito.any())).thenReturn("");
     }
 
     @Test
     void validateNotNull() {
-        ReleaseEntity expected = validatorService.validate(actual, new ReleaseEntity(), locale);
+        ReleaseEntity actual = validatorService.validate(expected, new ReleaseEntity(), locale);
         assertAll(
                 () -> assertEquals(expected.getName(), actual.getName()),
-                () -> assertNotNull(expected.getProject()),
-                () -> assertEquals(expected.getProject().getId(), actual.getProject()),
+                () -> assertNotNull(actual.getProject()),
+                () -> assertEquals(expected.getProject(), actual.getProject().getId()),
                 () -> assertEquals(expected.getStartDate(), actual.getStopDate()),
                 () -> assertEquals(expected.getStopDate(), actual.getStopDate())
         );
@@ -50,36 +50,36 @@ class ReleaseValidatorServiceImplTest {
 
     @Test
     void validateNullName() {
-        actual.setName(null);
+        expected.setName(null);
         assertThrows(NullValueFieldException.class,
-                () -> validatorService.validate(actual, new ReleaseEntity(), locale));
+                () -> validatorService.validate(expected, new ReleaseEntity(), locale));
     }
 
     @Test
     void validateNullProject() {
-        actual.setProject(null);
+        expected.setProject(null);
         assertThrows(NullValueFieldException.class,
-                () -> validatorService.validate(actual, new ReleaseEntity(), locale));
+                () -> validatorService.validate(expected, new ReleaseEntity(), locale));
     }
 
     @Test
     void validateNullStartDate() {
-        actual.setStartDate(null);
+        expected.setStartDate(null);
         assertThrows(NullValueFieldException.class,
-                () -> validatorService.validate(actual, new ReleaseEntity(), locale));
+                () -> validatorService.validate(expected, new ReleaseEntity(), locale));
     }
 
     @Test
     void validateNullStopDate() {
-        actual.setStopDate(null);
+        expected.setStopDate(null);
         assertThrows(NullValueFieldException.class,
-                () -> validatorService.validate(actual, new ReleaseEntity(), locale));
+                () -> validatorService.validate(expected, new ReleaseEntity(), locale));
     }
 
     @Test
     void validateStartAndStopDate() {
-        actual.setStopDate(new Date(actual.getStartDate().getTime() - 1));
+        expected.setStopDate(new Date(expected.getStartDate().getTime() - 1));
         assertThrows(IllegalDateException.class,
-                () -> validatorService.validate(actual, new ReleaseEntity(), locale));
+                () -> validatorService.validate(expected, new ReleaseEntity(), locale));
     }
 }

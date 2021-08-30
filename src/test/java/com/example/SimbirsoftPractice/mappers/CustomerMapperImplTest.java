@@ -1,6 +1,6 @@
 package com.example.SimbirsoftPractice.mappers;
 
-import com.example.SimbirsoftPractice.configurations.UtilCustomers;
+import com.example.SimbirsoftPractice.utils.UtilCustomers;
 import com.example.SimbirsoftPractice.entities.CustomerEntity;
 import com.example.SimbirsoftPractice.rest.dto.CustomerResponseDto;
 import com.example.SimbirsoftPractice.rest.dto.CustomerWithUUIDRequestDto;
@@ -19,23 +19,23 @@ class CustomerMapperImplTest {
 
     @Test
     void entityToResponseDto() {
-        CustomerResponseDto actual = response;
-        CustomerResponseDto expected = customerMapper.entityToResponseDto(entity);
+        CustomerResponseDto expected = response;
+        CustomerResponseDto actual = customerMapper.entityToResponseDto(entity);
         assertEquals(expected.getId(), actual.getId());
         assertEquals(expected.getName(), actual.getName());
     }
 
     @Test
     void listEntityToListResponseDto() {
-        List<CustomerResponseDto> actual = List.of(response, response);
-        List<CustomerResponseDto> expected = customerMapper.listEntityToListResponseDto(List.of(entity, entity));
+        List<CustomerResponseDto> expected = List.of(response, response);
+        List<CustomerResponseDto> actual = customerMapper.listEntityToListResponseDto(List.of(entity, entity));
         assertEquals(expected.size(), actual.size());
     }
 
     @Test
     void entityToResponseDtoWithUUID() {
-        CustomerEntity actual = entity;
-        CustomerWithUUIDRequestDto expected = customerMapper.entityToResponseDtoWithUUID(entity);
+        CustomerEntity expected = entity;
+        CustomerWithUUIDRequestDto actual = customerMapper.entityToResponseDtoWithUUID(entity);
         assertEquals(expected.getName(), actual.getName());
         assertEquals(expected.getUuid(), actual.getUuid());
     }

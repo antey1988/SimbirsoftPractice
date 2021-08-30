@@ -1,11 +1,11 @@
 package com.example.SimbirsoftPractice.rest.controllers;
 
+import com.example.SimbirsoftPractice.utils.UtilCustomers;
 import com.example.SimbirsoftPractice.rest.controllers.exceptions.NotFoundException;
 import com.example.SimbirsoftPractice.rest.dto.CustomerRequestDto;
 import com.example.SimbirsoftPractice.rest.dto.CustomerResponseDto;
 import com.example.SimbirsoftPractice.services.CustomerService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,36 +17,22 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.util.List;
 
 @WebMvcTest(value = CustomerController.class)
 @AutoConfigureMockMvc(addFilters = false)
 class CustomerControllerTest {
-    private CustomerResponseDto responseBody;
-    private CustomerRequestDto requestBody;
-    private List<CustomerResponseDto> responseBodyList;
+    private final CustomerResponseDto responseBody = UtilCustomers.defaultResponse();
+    private final CustomerRequestDto requestBody = UtilCustomers.defaultRequest();
+    private final List<CustomerResponseDto> responseBodyList = List.of(responseBody);
 
     @Autowired
     private ObjectMapper objectMapper;
     @Autowired
     private MockMvc mvc;
-
     @MockBean
     private CustomerService service;
-
-    @BeforeEach
-    public void setUp() {
-        responseBody = new CustomerResponseDto();
-        responseBody.setId(1L);
-        responseBody.setName("Name");
-
-        requestBody = new CustomerRequestDto();
-        requestBody.setName("Name");
-
-        responseBodyList = List.of(responseBody);
-    }
 
     @Test
     void testGetCustomersThenReturn200WithBody() throws Exception {
@@ -57,8 +43,8 @@ class CustomerControllerTest {
 
         assertEquals(response.getStatus(), 200);
 
-        String expected = response.getContentAsString();
-        String actual = objectMapper.writeValueAsString(responseBodyList);
+        String actual = response.getContentAsString();
+        String expected = objectMapper.writeValueAsString(responseBodyList);
         assertEquals(expected, actual);
     }
 
@@ -71,8 +57,8 @@ class CustomerControllerTest {
 
         assertEquals(response.getStatus(), 200);
 
-        String expected = response.getContentAsString();
-        String actual = objectMapper.writeValueAsString(responseBody);
+        String actual = response.getContentAsString();
+        String expected = objectMapper.writeValueAsString(responseBody);
         assertEquals(expected, actual);
     }
 
@@ -95,8 +81,8 @@ class CustomerControllerTest {
 
         assertEquals(response.getStatus(), 200);
 
-        String expected = response.getContentAsString();
-        String actual = objectMapper.writeValueAsString(responseBody);
+        String actual = response.getContentAsString();
+        String expected = objectMapper.writeValueAsString(responseBody);
         assertEquals(expected, actual);
     }
 
@@ -111,8 +97,8 @@ class CustomerControllerTest {
 
         assertEquals(response.getStatus(), 200);
 
-        String expected = response.getContentAsString();
-        String actual = objectMapper.writeValueAsString(responseBody);
+        String actual = response.getContentAsString();
+        String expected = objectMapper.writeValueAsString(responseBody);
         assertEquals(expected, actual);
     }
 

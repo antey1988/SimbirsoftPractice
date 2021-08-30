@@ -1,6 +1,6 @@
 package com.example.SimbirsoftPractice.services.validators.impl;
 
-import com.example.SimbirsoftPractice.configurations.UtilUsers;
+import com.example.SimbirsoftPractice.utils.UtilUsers;
 import com.example.SimbirsoftPractice.entities.UserEntity;
 import com.example.SimbirsoftPractice.rest.domain.exceptions.NullValueFieldException;
 import com.example.SimbirsoftPractice.rest.dto.UserRequestDto;
@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class UserValidatorServiceImplTest {
     private final Locale locale = Locale.ENGLISH;
 
-    private UserRequestDto actual;
+    private UserRequestDto expected;
     @Mock
     private PasswordEncoder passwordEncoder;
     @Mock
@@ -33,14 +33,14 @@ class UserValidatorServiceImplTest {
 
     @BeforeEach
     public void setUp() {
-        actual = UtilUsers.defaultRequest();
+        expected = UtilUsers.defaultRequest();
     }
 
 
     @Test
     void validateNotNull() {
-        Mockito.when(passwordEncoder.encode(actual.getPassword())).thenReturn(actual.getPassword());
-        UserEntity expected = validatorService.validate(actual, new UserEntity(), locale);
+        Mockito.when(passwordEncoder.encode(expected.getPassword())).thenReturn(expected.getPassword());
+        UserEntity actual = validatorService.validate(expected, new UserEntity(), locale);
         assertAll(
                 () -> assertEquals(expected.getName(), actual.getName()),
                 () -> assertEquals(expected.getPassword(), actual.getPassword()),
@@ -50,15 +50,15 @@ class UserValidatorServiceImplTest {
 
     @Test
     void validateNullName() {
-        actual.setName(null);
+        expected.setName(null);
         Mockito.when(messageSource.getMessage(Mockito.anyString(), Mockito.isNull(), Mockito.any())).thenReturn("");
-        assertThrows(NullValueFieldException.class, () -> validatorService.validate(actual, new UserEntity(), locale));
+        assertThrows(NullValueFieldException.class, () -> validatorService.validate(expected, new UserEntity(), locale));
     }
 
     @Test
     void validateNullPassword() {
-        actual.setPassword(null);
+        expected.setPassword(null);
         Mockito.when(messageSource.getMessage(Mockito.anyString(), Mockito.isNull(), Mockito.any())).thenReturn("");
-        assertThrows(NullValueFieldException.class, () -> validatorService.validate(actual, new UserEntity(), locale));
+        assertThrows(NullValueFieldException.class, () -> validatorService.validate(expected, new UserEntity(), locale));
     }
 }

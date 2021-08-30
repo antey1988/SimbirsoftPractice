@@ -1,4 +1,4 @@
-package com.example.SimbirsoftPractice.configurations;
+package com.example.SimbirsoftPractice.utils;
 
 import com.example.SimbirsoftPractice.entities.CustomerEntity;
 import com.example.SimbirsoftPractice.rest.dto.CustomerRequestDto;
